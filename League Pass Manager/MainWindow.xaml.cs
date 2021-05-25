@@ -21,6 +21,7 @@ using Newtonsoft.Json;
 using Rijndael256;
 using System.IO;
 using System.ComponentModel;
+using Microsoft.Win32;
 
 namespace League_Pass_Manager
 {
@@ -51,6 +52,11 @@ namespace League_Pass_Manager
         [DllImport("user32.dll")]
         public static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
 
+        public class Settings
+        {
+            public string filePath { get; set; } = "accounts.txt";
+        }
+
         public class Account 
         {
             public string region { get; set; }
@@ -59,6 +65,8 @@ namespace League_Pass_Manager
             public string password { get; set; }
         }
 
+        public Settings settings = new Settings();
+        
         public List<Account> accounts = new List<Account>();
         string password;
 
@@ -66,7 +74,12 @@ namespace League_Pass_Manager
         {
             string jsonList = JsonConvert.SerializeObject(accounts);
             string aeCiphertext = RijndaelEtM.Encrypt(jsonList, password, KeySize.Aes256);
-            File.WriteAllText("accounts.txt", aeCiphertext);
+            try { File.WriteAllText(settings.filePath, aeCiphertext); }
+            catch(System.UnauthorizedAccessException ex)
+            {
+                MessageBox.Show("You dont have permission to write to " + settings.filePath + Environment.NewLine + "Change account file location in settings or launch the app as an administrator.");
+            }
+   
         }
 
         bool readAccounts()
@@ -74,7 +87,7 @@ namespace League_Pass_Manager
             string jsonString = "";
             try
             {
-                jsonString = File.ReadAllText("accounts.txt");
+                jsonString = File.ReadAllText(settings.filePath);
             } catch(Exception e)
             {
                 MessageBox.Show("Account file doesn't exist yet and will be created now. Double check your encryption key and memorize it or write it down. You won't be able to access your account data without it!" + Environment.NewLine + Environment.NewLine + "Your encryption key: " + password, "WARNING", MessageBoxButton.OK, MessageBoxImage.Exclamation);
@@ -102,9 +115,43 @@ namespace League_Pass_Manager
             return true;
         }
 
+        public void saveSettings()
+        {
+            File.WriteAllText("settings.json", JsonConvert.SerializeObject(settings));
+        }
+
+        public void loadSettings()
+        {
+            string settingsJson = "";
+
+            try
+            {
+           
+                settingsJson = File.ReadAllText("settings.json");
+                settings = JsonConvert.DeserializeObject<Settings>(settingsJson);
+            }
+            catch(Exception e)
+            {
+                 saveSettings();
+                settingsJson = File.ReadAllText("settings.json");
+                settings = JsonConvert.DeserializeObject<Settings>(settingsJson);
+      
+            }
+        }
+
+
         public MainWindow()
         {
             InitializeComponent();
+            mainGrid.Visibility = Visibility.Hidden;
+            passwordPromptGrid.Visibility = Visibility.Visible;
+            Application.Current.MainWindow.Height = 103;
+            Application.Current.MainWindow.Width = 300;
+
+
+            //settings.filePath = "accounts.txt";
+            loadSettings();
+            passFileLocation.Text = settings.filePath;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -116,7 +163,7 @@ namespace League_Pass_Manager
                 if (pr.ProcessName == "RiotClientUx")
                 {
                     hWnd = pr.MainWindowHandle;
-                    ShowWindow(hWnd, 3);
+                    //ShowWindow(hWnd, 3);
                     SetForegroundWindow(hWnd);
                     var inputSimulator = new InputSimulator();
                     Account selectedAccount = new Account();
@@ -132,9 +179,9 @@ namespace League_Pass_Manager
                     Account result = accounts.Find(x => x.userName == selectedAccount.userName);
                
                     inputSimulator.Keyboard.TextEntry(result.userName);
-                    inputSimulator.Keyboard.KeyDown((VirtualKeyCode.TAB));
+                    inputSimulator.Keyboard.KeyPress((VirtualKeyCode.TAB));
                     inputSimulator.Keyboard.TextEntry(result.password);
-                    inputSimulator.Keyboard.KeyDown((VirtualKeyCode.RETURN));
+                    inputSimulator.Keyboard.KeyPress((VirtualKeyCode.RETURN));
                 }
             }
         }
@@ -156,6 +203,7 @@ namespace League_Pass_Manager
                 datagrid1.Items.Refresh();
                 passwordPromptGrid.Visibility = Visibility.Hidden;
                 Application.Current.MainWindow.Height = 400;
+                Application.Current.MainWindow.Width = 450;
 
                 mainGrid.Visibility = Visibility.Visible;
             }
@@ -189,6 +237,64 @@ namespace League_Pass_Manager
         private void datagrid1_CurrentCellChanged(object sender, EventArgs e)
         {
             saveAccounts(password);
+        }
+
+        private void copyDataToClipboardBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to copy all data in PLAIN TEXT to the clipboard?","Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            {
+                string jsonString = JsonConvert.SerializeObject(accounts);
+
+                Clipboard.SetText(jsonString);
+                MessageBox.Show("Data copied to clipboard.");
+            }
+        }
+
+
+        // Change encryption key
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            if (String.IsNullOrWhiteSpace(newEncryptionKey.Text))
+            {
+                MessageBox.Show("New encryption key input is empty. Please enter new encryption key!");
+                return;
+            } else
+            {
+                password = newEncryptionKey.Text;
+                saveAccounts(password);
+                newEncryptionKey.Text = "";
+                MessageBox.Show("Encryption key changed successfully.");
+            }
+        }
+
+        //Change pass file directory
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.AddExtension = true;
+            saveFileDialog.DefaultExt = "txt";
+            saveFileDialog.Filter = "Text file (*.txt)|*.txt";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    File.Move(settings.filePath, saveFileDialog.FileName);
+                } catch (Exception excep)
+                {
+
+                }
+                settings.filePath = saveFileDialog.FileName;
+                passFileLocation.Text = saveFileDialog.FileName;
+                saveSettings();
+               
+                MessageBox.Show("New path saved.");
+            }
+        }
+
+        private void passFileLocation_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
         }
     }
 }

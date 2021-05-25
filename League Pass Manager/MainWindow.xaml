@@ -5,21 +5,45 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:League_Pass_Manager"
+        FocusManager.FocusedElement="{Binding ElementName=encryptionKey}"
         mc:Ignorable="d"
        
-        Title="League Pass Manager" Height="103" Width="409" MinWidth="300" MinHeight="130" WindowStartupLocation="CenterScreen" Icon="/internet_lock_locked_padlock_password_secure_security_icon_127100.ico">
+        Title="League Pass Manager" Height="306" Width="409" MinWidth="300" MinHeight="130" WindowStartupLocation="CenterScreen" Icon="/internet_lock_locked_padlock_password_secure_security_icon_127100.ico">
     <Grid>
-        <Grid Visibility="Hidden" x:Name="mainGrid" >
-            <Button Content="Fill" Margin="10,38,113,8" Click="Button_Click" RenderTransformOrigin="0.5,1" VerticalAlignment="Bottom" Height="40"/>
-            <DataGrid x:Name="datagrid1" Margin="0,0,0,59" AutoGenerateColumns="True"  ItemsSource="{Binding Path=accounts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" CellEditEnding="datagrid1_CellEditEnding" GridLinesVisibility="All"  RowEditEnding="datagrid1_RowEditEnding" CurrentCellChanged="datagrid1_CurrentCellChanged" >
-                <DataGrid.Columns>
+        <Grid x:Name="mainGrid" >
+            <TabControl mah:HeaderedControlHelper.HeaderFontSize="16" mah:TabControlHelper.Underlined="TabPanel" Padding="0,2,0,0" Margin="-1,0,-1,0" >
+                <TabItem Header="Accounts" HorizontalAlignment="Center" Height="28" VerticalAlignment="Center" Width="79" Padding="6,2,6,2">
+                    <Grid>
+                        <Separator VerticalAlignment="Top" />
+                        <Button Content="Fill" Margin="10,38,113,8" Click="Button_Click" RenderTransformOrigin="0.5,1" VerticalAlignment="Bottom" Height="40"/>
+                        <DataGrid x:Name="datagrid1" Margin="0,0,0,59" AutoGenerateColumns="True"  ItemsSource="{Binding Path=accounts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" CellEditEnding="datagrid1_CellEditEnding" GridLinesVisibility="None"  RowEditEnding="datagrid1_RowEditEnding" CurrentCellChanged="datagrid1_CurrentCellChanged" BorderBrush="Transparent" VerticalGridLinesBrush="#337E7E7E" HorizontalGridLinesBrush="#337E7E7E" HeadersVisibility="Column" Foreground="#E5FFFFFF" >
+                            <DataGrid.Columns>
 
-                </DataGrid.Columns>
-            </DataGrid>
-            <Button Content="Remove" HorizontalAlignment="Right" Margin="0,0,10,8" VerticalAlignment="Bottom" Height="40" Width="98" Click="Button_Click_1"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <Button Content="Remove" HorizontalAlignment="Right" Margin="0,0,10,8" VerticalAlignment="Bottom" Height="40" Width="98" Click="Button_Click_1"/>
+
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Options" HorizontalAlignment="Center" Height="28" VerticalAlignment="Center" Width="68">
+                    <Grid>
+                        <StackPanel HorizontalAlignment="Left" Width="196" Margin="6,7,0,0">
+                            <Button Content="Change password file location" Height="28" Click="Button_Click_3"/>
+                            <Button x:Name="copyDataToClipboardBtn" Content="Copy data to clipboard" Margin="0,6,0,0" Click="copyDataToClipboardBtn_Click"/>
+                            <Button Content="Change encryption key " Margin="0,6,0,0" Click="Button_Click_2"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Stretch" Margin="215,7,8,0">
+                            <TextBox x:Name="passFileLocation" Text="" TextWrapping="Wrap" HorizontalAlignment="Stretch" IsReadOnly="True" Height="28" TextChanged="passFileLocation_TextChanged" />
+                            <TextBox x:Name="newEncryptionKey" Text="" TextWrapping="Wrap" Margin="0,39,0,0" Height="27.3" HorizontalAlignment="Stretch" mah:TextBoxHelper.Watermark="New encryption key..."/>
+                        </StackPanel>
+
+                    </Grid>
+                </TabItem>
+            </TabControl>
+
         </Grid>
-        <Grid  x:Name="passwordPromptGrid">
-            <PasswordBox x:Name="encryptionKey" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="33,0,33,57" mah:TextBoxHelper.Watermark="Encryption Key"/>
+        <Grid Visibility="Hidden" x:Name="passwordPromptGrid">
+            <PasswordBox x:Name="encryptionKey" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="16,0,16,57" mah:TextBoxHelper.Watermark="Encryption Key"/>
             <Button x:Name="unlockButton" Content="Unlock" Margin="16,0,16,17" VerticalAlignment="Bottom" Click="unlockButton_Click" IsDefault="True"/>
 
         </Grid>

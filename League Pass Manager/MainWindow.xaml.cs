@@ -60,6 +60,7 @@ namespace League_Pass_Manager
         public class Account 
         {
             public string region { get; set; }
+      
             public string description { get; set; }
             public string userName { get; set; }
             public string password { get; set; }
@@ -68,6 +69,10 @@ namespace League_Pass_Manager
         public Settings settings = new Settings();
         
         public List<Account> accounts = new List<Account>();
+
+  
+    
+     
         string password;
 
         void saveAccounts(string password)
@@ -75,7 +80,9 @@ namespace League_Pass_Manager
             string jsonList = JsonConvert.SerializeObject(accounts);
             string aeCiphertext = RijndaelEtM.Encrypt(jsonList, password, KeySize.Aes256);
             try { File.WriteAllText(settings.filePath, aeCiphertext); }
+#pragma warning disable CS0168 // Variable is declared but never used
             catch(System.UnauthorizedAccessException ex)
+#pragma warning restore CS0168 // Variable is declared but never used
             {
                 MessageBox.Show("You dont have permission to write to " + settings.filePath + Environment.NewLine + "Change account file location in settings or launch the app as an administrator.");
             }
@@ -293,6 +300,11 @@ namespace League_Pass_Manager
         }
 
         private void passFileLocation_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void datagrid1_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
         }

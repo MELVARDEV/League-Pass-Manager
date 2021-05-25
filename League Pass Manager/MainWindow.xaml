@@ -9,6 +9,10 @@
         mc:Ignorable="d"
        
         Title="League Pass Manager" Height="306" Width="409" MinWidth="300" MinHeight="130" WindowStartupLocation="CenterScreen" Icon="/internet_lock_locked_padlock_password_secure_security_icon_127100.ico">
+    <mah:MetroWindow.Resources>
+     
+    </mah:MetroWindow.Resources>
+    
     <Grid>
         <Grid x:Name="mainGrid" >
             <TabControl mah:HeaderedControlHelper.HeaderFontSize="16" mah:TabControlHelper.Underlined="TabPanel" Padding="0,2,0,0" Margin="-1,0,-1,0" >
@@ -16,9 +20,32 @@
                     <Grid>
                         <Separator VerticalAlignment="Top" />
                         <Button Content="Fill" Margin="10,38,113,8" Click="Button_Click" RenderTransformOrigin="0.5,1" VerticalAlignment="Bottom" Height="40"/>
-                        <DataGrid x:Name="datagrid1" Margin="0,0,0,59" AutoGenerateColumns="True"  ItemsSource="{Binding Path=accounts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" CellEditEnding="datagrid1_CellEditEnding" GridLinesVisibility="None"  RowEditEnding="datagrid1_RowEditEnding" CurrentCellChanged="datagrid1_CurrentCellChanged" BorderBrush="Transparent" VerticalGridLinesBrush="#337E7E7E" HorizontalGridLinesBrush="#337E7E7E" HeadersVisibility="Column" Foreground="#E5FFFFFF" >
+                        <DataGrid x:Name="datagrid1" Margin="0,0,0,59" AutoGenerateColumns="False"  ItemsSource="{Binding Path=accounts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" CellEditEnding="datagrid1_CellEditEnding" GridLinesVisibility="None"  RowEditEnding="datagrid1_RowEditEnding" CurrentCellChanged="datagrid1_CurrentCellChanged" BorderBrush="Transparent" VerticalGridLinesBrush="#337E7E7E" HorizontalGridLinesBrush="#337E7E7E" HeadersVisibility="Column" Foreground="#E5FFFFFF" SelectionChanged="datagrid1_SelectionChanged" >
+                        
                             <DataGrid.Columns>
+                                
+                                <DataGridTextColumn Header="Region"
+                                     x:Name="columnRegion" 
+                                     Binding="{Binding Path=region}"
+                                     IsReadOnly="False">
+                                </DataGridTextColumn>
 
+                         
+                                <DataGridTextColumn Header="Login"
+                                     x:Name="columnUserName" 
+                                     Binding="{Binding Path=userName}"
+                                     IsReadOnly="False">
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Password"
+                                     x:Name="columnPassword" 
+                                     Binding="{Binding Path=password}"
+                                     IsReadOnly="False">
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Description"
+                                     x:Name="columnDescription" 
+                                     Binding="{Binding Path=description}"
+                                     IsReadOnly="False">
+                                </DataGridTextColumn>
                             </DataGrid.Columns>
                         </DataGrid>
                         <Button Content="Remove" HorizontalAlignment="Right" Margin="0,0,10,8" VerticalAlignment="Bottom" Height="40" Width="98" Click="Button_Click_1"/>

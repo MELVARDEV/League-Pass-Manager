@@ -22,6 +22,9 @@ using Rijndael256;
 using System.IO;
 using System.ComponentModel;
 using Microsoft.Win32;
+using MingweiSamuel.Camille;
+using MingweiSamuel.Camille.SummonerV4;
+using MingweiSamuel.Camille.LeagueV4;
 
 namespace League_Pass_Manager
 {
@@ -55,6 +58,7 @@ namespace League_Pass_Manager
         public class Settings
         {
             public string filePath { get; set; } = "accounts.txt";
+            public string apiKey { get; set; }
         }
 
         public class Account 
@@ -62,17 +66,24 @@ namespace League_Pass_Manager
             public string region { get; set; }
       
             public string description { get; set; }
+            public string nick { get; set; }
             public string userName { get; set; }
             public string password { get; set; }
+            public string level { get; set; } = "-";
+            public string tier { get; set; } = "-";
+            public string profileIcon { get; set; }
         }
 
         public Settings settings = new Settings();
         
         public List<Account> accounts = new List<Account>();
 
-  
-    
-     
+ 
+
+
+
+
+
         string password;
 
         void saveAccounts(string password)
@@ -80,9 +91,7 @@ namespace League_Pass_Manager
             string jsonList = JsonConvert.SerializeObject(accounts);
             string aeCiphertext = RijndaelEtM.Encrypt(jsonList, password, KeySize.Aes256);
             try { File.WriteAllText(settings.filePath, aeCiphertext); }
-#pragma warning disable CS0168 // Variable is declared but never used
             catch(System.UnauthorizedAccessException ex)
-#pragma warning restore CS0168 // Variable is declared but never used
             {
                 MessageBox.Show("You dont have permission to write to " + settings.filePath + Environment.NewLine + "Change account file location in settings or launch the app as an administrator.");
             }
@@ -113,10 +122,56 @@ namespace League_Pass_Manager
             try
             {
                 accounts = JsonConvert.DeserializeObject<List<Account>>(plaintext);
+                var riotApi = RiotApi.NewInstance(settings.apiKey);
+                accounts.ForEach(account =>
+                {
+                    MingweiSamuel.Camille.Enums.Region region = MingweiSamuel.Camille.Enums.Region.EUNE;
+                    if(account.region.ToLower() == "eune")
+                    {
+                        region = MingweiSamuel.Camille.Enums.Region.EUNE;
+                    }
+
+                    if (account.region.ToLower() == "euw")
+                    {
+                        region = MingweiSamuel.Camille.Enums.Region.EUW;
+                    }
+
+                    if (account.region.ToLower() == "na")
+                    {
+                        region = MingweiSamuel.Camille.Enums.Region.NA;
+                    }
+
+                    if (account.region.ToLower() == "kr")
+                    {
+                        region = MingweiSamuel.Camille.Enums.Region.KR;
+                    }
+
+                    if (account.region.ToLower() == "oce")
+                    {
+                        region = MingweiSamuel.Camille.Enums.Region.OCE;
+                    }
+
+                    if (account.region.ToLower() == "jp")
+                    {
+                        region = MingweiSamuel.Camille.Enums.Region.JP;
+                    }
+
+                    if (!String.IsNullOrEmpty(account.nick))
+                    {
+                        Summoner summoner = riotApi.SummonerV4.GetBySummonerName(region, account.nick);
+                        account.level = summoner.SummonerLevel.ToString();
+                        LeagueEntry[] league = riotApi.LeagueV4.GetLeagueEntriesForSummoner(region, summoner.Id);
+                        LeagueEntry summonerLeague = league.ToList().Find(i => i.QueueType == "RANKED_SOLO_5x5");
+                        account.tier = summonerLeague.Tier + " " + summonerLeague.Rank;
+                        
+                    }
+                  
+                });
             }
             catch (Exception e)
             {
                 MessageBox.Show("Accounts file corrupted!");
+                Console.WriteLine(e.Message);
                 return false;
             }
             return true;
@@ -145,6 +200,8 @@ namespace League_Pass_Manager
       
             }
         }
+
+
 
 
         public MainWindow()
@@ -210,7 +267,7 @@ namespace League_Pass_Manager
                 datagrid1.Items.Refresh();
                 passwordPromptGrid.Visibility = Visibility.Hidden;
                 Application.Current.MainWindow.Height = 400;
-                Application.Current.MainWindow.Width = 450;
+                Application.Current.MainWindow.Width = 600;
 
                 mainGrid.Visibility = Visibility.Visible;
             }

@@ -8,7 +8,7 @@
         FocusManager.FocusedElement="{Binding ElementName=encryptionKey}"
         mc:Ignorable="d"
        
-        Title="League Pass Manager" Height="306" Width="409" MinWidth="300" MinHeight="130" WindowStartupLocation="CenterScreen" Icon="/internet_lock_locked_padlock_password_secure_security_icon_127100.ico">
+        Title="League Pass Manager" Height="306" Width="550" MinWidth="300" MinHeight="130" WindowStartupLocation="CenterScreen" Icon="/internet_lock_locked_padlock_password_secure_security_icon_127100.ico">
     <mah:MetroWindow.Resources>
      
     </mah:MetroWindow.Resources>
@@ -30,7 +30,12 @@
                                      IsReadOnly="False">
                                 </DataGridTextColumn>
 
-                         
+                                <DataGridTextColumn Header="Nick"
+                                     x:Name="columnNick" 
+                                     Binding="{Binding Path=nick}"
+                                     IsReadOnly="False">
+                                </DataGridTextColumn>
+
                                 <DataGridTextColumn Header="Login"
                                      x:Name="columnUserName" 
                                      Binding="{Binding Path=userName}"
@@ -42,11 +47,23 @@
                                      Binding="{Binding Path=password}"
                                      IsReadOnly="False">
                                 </DataGridTextColumn>
+                               
+                                <DataGridTextColumn Header="Tier"
+                                     x:Name="columnTier" 
+                                     Binding="{Binding Path=tier}"
+                                     IsReadOnly="True" MinWidth="30">
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Level"
+                                     x:Name="columnLevel" 
+                                     Binding="{Binding Path=level}"
+                                     IsReadOnly="True" MinWidth="30">
+                                </DataGridTextColumn>
                                 <DataGridTextColumn Header="Description"
                                      x:Name="columnDescription" 
                                      Binding="{Binding Path=description}"
                                      IsReadOnly="False" MinWidth="30">
                                 </DataGridTextColumn>
+                                
                             </DataGrid.Columns>
                         </DataGrid>
                         <Button Content="Remove" HorizontalAlignment="Right" Margin="0,0,10,8" VerticalAlignment="Bottom" Height="40" Width="98" Click="Button_Click_1"/>

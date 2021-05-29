@@ -16,12 +16,19 @@
     <PackageReference Include="InputSimulator" Version="1.0.4" />
     <PackageReference Include="InputSimulatorPlus" Version="1.0.7" />
     <PackageReference Include="MahApps.Metro" Version="2.4.5" />
+    <PackageReference Include="MingweiSamuel.Camille" Version="2.8.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Rijndael256" Version="3.2.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="internet_lock_locked_padlock_password_secure_security_icon_127100.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

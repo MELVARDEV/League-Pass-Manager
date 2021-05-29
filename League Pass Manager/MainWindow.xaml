@@ -36,6 +36,7 @@
                                      Binding="{Binding Path=userName}"
                                      IsReadOnly="False">
                                 </DataGridTextColumn>
+                               
                                 <DataGridTextColumn Header="Password"
                                      x:Name="columnPassword" 
                                      Binding="{Binding Path=password}"
@@ -44,7 +45,7 @@
                                 <DataGridTextColumn Header="Description"
                                      x:Name="columnDescription" 
                                      Binding="{Binding Path=description}"
-                                     IsReadOnly="False">
+                                     IsReadOnly="False" MinWidth="30">
                                 </DataGridTextColumn>
                             </DataGrid.Columns>
                         </DataGrid>

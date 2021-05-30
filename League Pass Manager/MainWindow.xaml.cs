@@ -22,6 +22,7 @@ using Rijndael256;
 using System.IO;
 using System.ComponentModel;
 using Microsoft.Win32;
+using Path = System.IO.Path;
 
 namespace League_Pass_Manager
 {
@@ -48,13 +49,22 @@ namespace League_Pass_Manager
         [DllImport("user32.dll")]
         public static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, string lParam);
 
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool IsWindowVisible(IntPtr hWnd);
+
         //include FindWindowEx
         [DllImport("user32.dll")]
         public static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
 
         public class Settings
         {
+
             public string filePath { get; set; } = "accounts.txt";
+            public bool exitAfterFill { get; set; } = false;
+            public string leagueClientPath { get; set; } = null;
+            public bool autoOpenClient { get; set; } = false;
+            public int launchDelay { get; set; } = 2000;
         }
 
         public class Account 
@@ -64,6 +74,8 @@ namespace League_Pass_Manager
             public string description { get; set; }
             public string userName { get; set; }
             public string password { get; set; }
+
+       
         }
 
         public Settings settings = new Settings();
@@ -144,6 +156,11 @@ namespace League_Pass_Manager
                 settings = JsonConvert.DeserializeObject<Settings>(settingsJson);
       
             }
+
+            autoOpenClientSwitch.IsOn = settings.autoOpenClient;
+            exitAfterFillingSwitch.IsOn = settings.exitAfterFill;
+            delaySlider.Value = Convert.ToDouble(settings.launchDelay);
+            launchDelayLabel.Content = settings.launchDelay.ToString() + " ms";
         }
 
 
@@ -161,36 +178,104 @@ namespace League_Pass_Manager
             passFileLocation.Text = settings.filePath;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        void simulateFill(Process pr)
+        {
+            IntPtr hWnd = pr.MainWindowHandle;
+            //ShowWindow(hWnd, 3);
+            SetForegroundWindow(hWnd);
+            var inputSimulator = new InputSimulator();
+            Account selectedAccount = new Account();
+            try
+            {
+                selectedAccount = (Account)datagrid1.SelectedItem;
+            }
+            catch (Exception exce)
+            {
+                MessageBox.Show("You need to select an account first!");
+                return;
+            }
+
+            Account result = accounts.Find(x => x.userName == selectedAccount.userName);
+
+            if (!String.IsNullOrEmpty(result.userName))
+            {
+                inputSimulator.Keyboard.TextEntry(result.userName);
+            }
+
+            inputSimulator.Keyboard.KeyPress((VirtualKeyCode.TAB));
+
+            if (!String.IsNullOrEmpty(result.password))
+            {
+                inputSimulator.Keyboard.TextEntry(result.password);
+            }
+
+            inputSimulator.Keyboard.KeyPress((VirtualKeyCode.RETURN));
+
+            if (settings.exitAfterFill)
+            {
+
+                this.Close();
+
+            }
+            return;
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
             IntPtr hWnd;
             Process[] processRunning = Process.GetProcesses();
+            Process leagueClientProcess = null;
             foreach (Process pr in processRunning)
             {
                 if (pr.ProcessName == "RiotClientUx")
                 {
-                    hWnd = pr.MainWindowHandle;
-                    //ShowWindow(hWnd, 3);
-                    SetForegroundWindow(hWnd);
-                    var inputSimulator = new InputSimulator();
-                    Account selectedAccount = new Account();
-                    try
-                    {
-                        selectedAccount = (Account)datagrid1.SelectedItem;
-                    } catch (Exception exce)
-                    {
-                        MessageBox.Show("You need to select an account first!");
-                        return;
-                    }
-
-                    Account result = accounts.Find(x => x.userName == selectedAccount.userName);
-               
-                    inputSimulator.Keyboard.TextEntry(result.userName);
-                    inputSimulator.Keyboard.KeyPress((VirtualKeyCode.TAB));
-                    inputSimulator.Keyboard.TextEntry(result.password);
-                    inputSimulator.Keyboard.KeyPress((VirtualKeyCode.RETURN));
-                }
+                    leagueClientProcess = pr;
+                } 
             }
+
+            if (leagueClientProcess != null)
+            {
+                simulateFill(leagueClientProcess);
+            } else if (settings.autoOpenClient)
+            {
+
+                string sessionFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Riot Games" + Path.DirectorySeparatorChar + "Riot Client" + Path.DirectorySeparatorChar + "Data" + Path.DirectorySeparatorChar + "RiotClientPrivateSettings.yaml");
+
+                try
+                {
+                    File.Delete(sessionFilePath);
+                } catch (Exception ex)
+                {
+                    MessageBox.Show("Cannot Delete");
+                    Console.WriteLine(ex.Message);
+                }
+              
+
+               
+
+
+                leagueClientProcess = Process.Start(settings.leagueClientPath, "--launch-product=league_of_legends --launch-patchline=live");
+
+
+                Process[] pname = Process.GetProcessesByName("RiotClientUx");
+                while (pname.Length == 0)
+                {
+                    await Task.Delay(200);
+                    pname = Process.GetProcessesByName("RiotClientUx");
+                }
+
+
+                
+
+                await Task.Delay(settings.launchDelay);
+                simulateFill(leagueClientProcess);
+            } else
+            {
+                MessageBox.Show("League of Legends login screen not found...");
+            }
+         
+
+         
         }
 
 
@@ -307,6 +392,62 @@ namespace League_Pass_Manager
         private void datagrid1_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
+        }
+
+        private void exitAfterFillingSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+
+      
+            settings.exitAfterFill = exitAfterFillingSwitch.IsOn;
+            saveSettings();
+        }
+
+        private void autoOpenClientSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+         
+            if (String.IsNullOrWhiteSpace(settings.leagueClientPath) && tabControl.SelectedIndex == 1 && autoOpenClientSwitch.IsOn == true)
+            {
+            
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.AddExtension = true;
+                openFileDialog.DefaultExt = "exe";
+                openFileDialog.Filter = "RiotClientServices.exe|RiotClientServices.exe";
+                if (openFileDialog.ShowDialog() == true)
+                {
+                  
+                    settings.leagueClientPath = openFileDialog.FileName;
+                    settings.autoOpenClient = true;
+                    autoOpenClientSwitch.IsOn = true;
+                   
+                } else
+                {
+                    settings.autoOpenClient = false;
+                    autoOpenClientSwitch.IsOn = false;
+                }
+            }
+
+            saveSettings();
+        }
+
+        private void delaySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if(tabControl.SelectedIndex == 1)
+            {
+                settings.launchDelay = Convert.ToInt32(delaySlider.Value);
+                launchDelayLabel.Content = String.Concat(settings.launchDelay.ToString(), " ms");
+            }
+          
+        }
+
+        private void delaySlider_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+
+            saveSettings();
+        }
+
+        private void delaySlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            saveSettings();
         }
     }
 }

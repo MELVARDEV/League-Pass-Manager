@@ -287,7 +287,8 @@ namespace League_Pass_Manager
             {
                 try
                 {
-                    mainWindow.FindFirstDescendant(cf.ByName("Sign in")).AsButton().Invoke();
+          
+                    mainWindow.FindFirstDescendant(cf.ByName("Sign in").And(cf.ByControlType(ControlType.Button))).AsButton().Invoke();
                     tryAgain = false;
                 }
                 catch (Exception e) { }

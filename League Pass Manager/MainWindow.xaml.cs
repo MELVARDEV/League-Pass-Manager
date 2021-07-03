@@ -1,32 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using WindowsInput;
-using WindowsInput.Native;
 using MahApps.Metro.Controls;
 using Newtonsoft.Json;
 using Rijndael256;
 using System.IO;
-using System.ComponentModel;
 using Microsoft.Win32;
 using Path = System.IO.Path;
 using FlaUI.UIA3;
 using FlaUI.Core.Conditions;
 using FlaUI.Core.AutomationElements;
-using FlaUI.Core.Tools;
 using FlaUI.Core.Definitions;
 
 namespace League_Pass_Manager
@@ -231,6 +219,7 @@ namespace League_Pass_Manager
             catch (Exception exce)
             {
                 MessageBox.Show("You need to select an account first!");
+                this.Show();
                 return;
             }
 
@@ -306,44 +295,7 @@ namespace League_Pass_Manager
             return;
 
 
-            /*IntPtr hWnd = pr.MainWindowHandle;
-            //ShowWindow(hWnd, 3);
-            SetForegroundWindow(hWnd);
-            var inputSimulator = new InputSimulator();
-            Account selectedAccount = new Account();
-            try
-            {
-                selectedAccount = (Account)datagrid1.SelectedItem;
-            }
-            catch (Exception exce)
-            {
-                MessageBox.Show("You need to select an account first!");
-                return;
-            }
-
-            Account result = accounts.Find(x => x.userName == selectedAccount.userName);
-
-            if (!String.IsNullOrEmpty(result.userName))
-            {
-                inputSimulator.Keyboard.TextEntry(result.userName);
-            }
-
-            inputSimulator.Keyboard.KeyPress((VirtualKeyCode.TAB));
-
-            if (!String.IsNullOrEmpty(result.password))
-            {
-                inputSimulator.Keyboard.TextEntry(result.password);
-            }
-
-            inputSimulator.Keyboard.KeyPress((VirtualKeyCode.RETURN));
-
-            if (settings.exitAfterFill)
-            {
-
-                this.Close();
-
-            }
-            return;*/
+           
         }
 
         private async void Button_Click(object sender, RoutedEventArgs e)
@@ -362,8 +314,14 @@ namespace League_Pass_Manager
             }
 
 
+            if (settings.exitAfterFill)
+            {
 
+                this.Hide();
+
+            }
    
+
 
 
 
@@ -396,6 +354,7 @@ namespace League_Pass_Manager
                 } catch (Exception ex)
                 {
                     MessageBox.Show("Cannot Delete");
+                    this.Show();
                     Console.WriteLine(ex.Message);
                 }
               
@@ -440,6 +399,8 @@ namespace League_Pass_Manager
             } else
             {
                 MessageBox.Show("League of Legends login screen not found...");
+
+                this.Show();
             }
          
 
@@ -592,6 +553,10 @@ namespace League_Pass_Manager
                     settings.autoOpenClient = false;
                     autoOpenClientSwitch.IsOn = false;
                 }
+            } else
+            {
+                settings.autoOpenClient = autoOpenClientSwitch.IsOn;
+        
             }
 
             saveSettings();

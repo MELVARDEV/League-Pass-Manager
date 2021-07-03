@@ -56,13 +56,26 @@
                     <Grid>
                         <StackPanel HorizontalAlignment="Left" Width="196" Margin="6,7,0,0">
                             <Button Content="Change password file location" Height="28" Click="Button_Click_3"/>
-                            <Button x:Name="copyDataToClipboardBtn" Content="Copy data to clipboard" Margin="0,6,0,0" Click="copyDataToClipboardBtn_Click"/>
                             <Button Content="Change encryption key " Margin="0,6,0,0" Click="Button_Click_2"/>
-                            <mah:ToggleSwitch x:Name="exitAfterFillingSwitch" Header="Exit after filling data" Height="100" OnContent="Yes" OffContent="No"  Width="100" Margin="0,10,0,0" HorizontalAlignment="Center" IsEnabled="True" Toggled="exitAfterFillingSwitch_Toggled"/>
+                            <Button x:Name="copyDataToClipboardBtn" Content="Copy data to clipboard" Margin="0,6,0,0" Click="copyDataToClipboardBtn_Click"/>
+                         
+                            <mah:ToggleSwitch x:Name="exitAfterFillingSwitch" Header="Exit after filling data" Height="59" OnContent="Yes" OffContent="No"  Width="100" Margin="0,10,0,0" HorizontalAlignment="Center" IsEnabled="True" Toggled="exitAfterFillingSwitch_Toggled"/>
+                            <mah:ToggleSwitch x:Name="staySignedInSwitch" Header="Stay signed in" Height="59" OnContent="Yes" OffContent="No"  Width="100" IsEnabled="True" Toggled="staySignedInSwitch_Toggled" HorizontalAlignment="Center"/>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Stretch" Margin="215,7,8,0">
-                            <TextBox x:Name="passFileLocation" Text="" TextWrapping="Wrap" HorizontalAlignment="Stretch" IsReadOnly="True" Height="28" TextChanged="passFileLocation_TextChanged" />
-                            <TextBox x:Name="newEncryptionKey" Text="" TextWrapping="Wrap" Margin="0,39,0,0" Height="27.3" HorizontalAlignment="Stretch" mah:TextBoxHelper.Watermark="New encryption key..."/>
+                            <TextBox x:Name="passFileLocation" Text="" TextWrapping="Wrap" HorizontalAlignment="Stretch" IsReadOnly="True" Height="28" TextChanged="passFileLocation_TextChanged">
+                                <TextBox.ContextMenu>
+                                    <ContextMenu  Name="cMenu1" >
+        
+                                        <MenuItem  Header="Copy Path"  Name="cMenuItemCopy" Click="cMenuItemCopy_Click"  />
+                                        <MenuItem  Header="Open directory in explorer" Name="cMenuItemOpenDir" Click="cMenuItemOpenDir_Click" />
+
+                                    </ContextMenu>
+                                </TextBox.ContextMenu>
+                            </TextBox>
+                            <TextBox x:Name="newEncryptionKey" Text="" TextWrapping="Wrap" Margin="0,6,0,0" Height="27.3" HorizontalAlignment="Stretch" mah:TextBoxHelper.Watermark="New encryption key..."/>
+                            <Button x:Name="openConfigFile" Content="Open config file" Margin="0,6,0,0" IsEnabled="False"/>
+
                             <mah:ToggleSwitch x:Name="autoOpenClientSwitch" Header="Auto open client" Height="56" Width="107" Margin="17,12,0,0" HorizontalAlignment="Left"  OnContent="Yes" OffContent="No" Toggled="autoOpenClientSwitch_Toggled" HorizontalContentAlignment="Left" MinWidth="104"/>
                             <Label Content="Delay after launching client" Margin="11,3,0,0" HorizontalAlignment="Center" />
                             <Slider x:Name="delaySlider" Margin="10,1,8,0" Maximum="5000" Value="2000" ValueChanged="delaySlider_ValueChanged" MouseUp="delaySlider_MouseUp" Thumb.DragCompleted="delaySlider_DragCompleted" />

@@ -23,6 +23,11 @@ using System.IO;
 using System.ComponentModel;
 using Microsoft.Win32;
 using Path = System.IO.Path;
+using FlaUI.UIA3;
+using FlaUI.Core.Conditions;
+using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Tools;
+using FlaUI.Core.Definitions;
 
 namespace League_Pass_Manager
 {
@@ -64,7 +69,8 @@ namespace League_Pass_Manager
             public bool exitAfterFill { get; set; } = false;
             public string leagueClientPath { get; set; } = null;
             public bool autoOpenClient { get; set; } = false;
-            public int launchDelay { get; set; } = 2000;
+            public bool staySignedIn { get; set; } = true;
+            public int launchDelay { get; set; } = 0;
         }
 
         public class Account 
@@ -159,6 +165,7 @@ namespace League_Pass_Manager
 
             autoOpenClientSwitch.IsOn = settings.autoOpenClient;
             exitAfterFillingSwitch.IsOn = settings.exitAfterFill;
+            staySignedInSwitch.IsOn = settings.staySignedIn;
             delaySlider.Value = Convert.ToDouble(settings.launchDelay);
             launchDelayLabel.Content = settings.launchDelay.ToString() + " ms";
         }
@@ -178,9 +185,125 @@ namespace League_Pass_Manager
             passFileLocation.Text = settings.filePath;
         }
 
+        public void wait(int milliseconds)
+        {
+            var timer1 = new System.Windows.Forms.Timer();
+            if (milliseconds == 0 || milliseconds < 0) return;
+
+            // Console.WriteLine("start wait timer");
+            timer1.Interval = milliseconds;
+            timer1.Enabled = true;
+            timer1.Start();
+
+            timer1.Tick += (s, e) =>
+            {
+                timer1.Enabled = false;
+                timer1.Stop();
+                // Console.WriteLine("stop wait timer");
+            };
+
+            while (timer1.Enabled)
+            {
+                
+            }
+        }
+
         void simulateFill(Process pr)
         {
-            IntPtr hWnd = pr.MainWindowHandle;
+    
+            var application = FlaUI.Core.Application.Attach(pr.Id);
+                
+           
+            var mainWindow = application.GetMainWindow(new UIA3Automation());
+            //mainWindow.FindFirstDescendant();
+
+            FlaUI.Core.Input.Wait.UntilResponsive(mainWindow.FindFirstChild(), TimeSpan.FromMilliseconds(5000));
+    
+            // MessageBox.Show(mainWindow.Title);
+
+            ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
+            Account selectedAccount = new Account();
+
+            try
+            {
+                selectedAccount = (Account)datagrid1.SelectedItem;
+            }
+            catch (Exception exce)
+            {
+                MessageBox.Show("You need to select an account first!");
+                return;
+            }
+
+            Account result = accounts.Find(x => x.userName == selectedAccount.userName);
+
+            bool tryAgain = true;
+            if (!String.IsNullOrEmpty(result.userName))
+            {
+                while (tryAgain)
+                {
+                    try
+                    {
+                        mainWindow.FindFirstDescendant(cf.ByName("USERNAME")).AsTextBox().Text = result.userName;
+                        
+                        tryAgain = false;
+                    }
+                    catch (Exception e) {}
+                }
+            }
+
+
+            tryAgain = true;
+            if (!String.IsNullOrEmpty(result.password))
+            {
+                while (tryAgain)
+                {
+                    try
+                    {
+                        mainWindow.FindFirstDescendant(cf.ByName("PASSWORD")).AsTextBox().Text = result.password;
+                        tryAgain = false;
+                    }
+                    catch (Exception e) { }
+                }
+            }
+
+
+            tryAgain = true;
+            while (tryAgain)
+            {
+                try
+                {
+                    if (mainWindow.FindFirstDescendant(cf.ByName("Stay signed in")).AsCheckBox().IsToggled != settings.staySignedIn)
+                    {
+                        mainWindow.FindFirstDescendant(cf.ByName("Stay signed in")).AsCheckBox().Toggle();
+                    }
+                    tryAgain = false;
+                }
+                catch (Exception e) { }
+            }
+
+
+            tryAgain = true;
+            while (tryAgain)
+            {
+                try
+                {
+                    mainWindow.FindFirstDescendant(cf.ByName("Sign in")).AsButton().Invoke();
+                    tryAgain = false;
+                }
+                catch (Exception e) { }
+            }
+       
+
+            if (settings.exitAfterFill)
+            {
+
+                this.Close();
+
+            }
+            return;
+
+
+            /*IntPtr hWnd = pr.MainWindowHandle;
             //ShowWindow(hWnd, 3);
             SetForegroundWindow(hWnd);
             var inputSimulator = new InputSimulator();
@@ -217,7 +340,7 @@ namespace League_Pass_Manager
                 this.Close();
 
             }
-            return;
+            return;*/
         }
 
         private async void Button_Click(object sender, RoutedEventArgs e)
@@ -236,6 +359,7 @@ namespace League_Pass_Manager
             if (leagueClientProcess != null)
             {
                 simulateFill(leagueClientProcess);
+        
             } else if (settings.autoOpenClient)
             {
 
@@ -265,10 +389,29 @@ namespace League_Pass_Manager
                 }
 
 
-                
 
+                // MessageBox.Show(leagueClientProcess.Id.ToString());
+        
+
+       
+                var mainWindowTitle = pname[0].MainWindowTitle;
+                while (mainWindowTitle != "Riot Client")
+                {
+                    await Task.Delay(200);
+                    Process[] proc = Process.GetProcessesByName("RiotClientUx");
+                    while (proc.Length == 0)
+                    {
+                        proc = Process.GetProcessesByName("RiotClientUx");
+                    }
+                    mainWindowTitle = proc[0].MainWindowTitle;
+                    if(proc[0].MainWindowTitle == "Riot Client")
+                    {
+                        pname[0] = proc[0];
+                    }
+                }
                 await Task.Delay(settings.launchDelay);
-                simulateFill(leagueClientProcess);
+                // MessageBox.Show(pname[0].MainWindowTitle);
+                simulateFill(pname[0]);
             } else
             {
                 MessageBox.Show("League of Legends login screen not found...");
@@ -448,6 +591,41 @@ namespace League_Pass_Manager
         private void delaySlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             saveSettings();
+        }
+
+        private void staySignedInSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+            settings.staySignedIn = staySignedInSwitch.IsOn;
+            saveSettings();
+        }
+
+        private void cMenuItemCopy_Click(object sender, RoutedEventArgs e)
+        {
+
+            try
+            {
+                Clipboard.SetText(Path.Join(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), settings.filePath));
+            }
+            catch (Exception ex) { }
+          
+        }
+
+        private void cMenuItemOpenDir_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string filePath = Path.Join(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), settings.filePath);
+
+                if (!File.Exists(filePath))
+                {
+                    return;
+                }
+
+                string argument = "/select, \"" + filePath + "\"";
+                System.Diagnostics.Process.Start("explorer.exe", argument);
+            }
+            catch (Exception ex) { }
+        
         }
     }
 }

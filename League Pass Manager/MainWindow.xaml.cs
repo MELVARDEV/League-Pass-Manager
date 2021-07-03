@@ -234,6 +234,8 @@ namespace League_Pass_Manager
                 return;
             }
 
+
+
             Account result = accounts.Find(x => x.userName == selectedAccount.userName);
 
             bool tryAgain = true;
@@ -346,6 +348,25 @@ namespace League_Pass_Manager
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
+
+            Account selectedAccount = new Account();
+            try
+            {
+                selectedAccount = (Account)datagrid1.SelectedItem;
+                Account result = accounts.Find(x => x.userName == selectedAccount.userName);
+            }
+            catch (Exception exce)
+            {
+                MessageBox.Show("You need to select an account first!");
+                return;
+            }
+
+
+
+   
+
+
+
             IntPtr hWnd;
             Process[] processRunning = Process.GetProcesses();
             Process leagueClientProcess = null;
@@ -359,10 +380,13 @@ namespace League_Pass_Manager
 
             if (leagueClientProcess != null)
             {
+               
+
                 simulateFill(leagueClientProcess);
         
             } else if (settings.autoOpenClient)
             {
+           
 
                 string sessionFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Riot Games" + Path.DirectorySeparatorChar + "Riot Client" + Path.DirectorySeparatorChar + "Data" + Path.DirectorySeparatorChar + "RiotClientPrivateSettings.yaml");
 

@@ -1,9 +1,11 @@
 # League-Pass-Manager 🔑
 A tool that makes it easier to manage your League of Legends password, made for people who use infamous password storage method -> "accounts.txt" on the desktop.
 
-![image](https://user-images.githubusercontent.com/36396619/119584620-30d0d280-bdc9-11eb-9190-8d6a2d0708e2.png)
+![Screenshot](https://user-images.githubusercontent.com/36396619/125109347-86481100-e0e3-11eb-9102-4ea4c95be81c.png)
 
-![image](https://user-images.githubusercontent.com/36396619/119584928-f3207980-bdc9-11eb-8414-b3ef46b90613.png)
+![accounts](https://user-images.githubusercontent.com/36396619/125109392-94962d00-e0e3-11eb-8fa9-8b7985f138f9.png)
+
+![settings](https://user-images.githubusercontent.com/36396619/125109402-9829b400-e0e3-11eb-90c4-29e6c730545d.png)
 
 
 ## Features 📃
@@ -24,14 +26,11 @@ A tool that makes it easier to manage your League of Legends password, made for 
 ## Todo ✔️
 - [x] Option to change data file location
 - [x] Option to change encryption key
-- [x] Option to copy all data to clipboard
+- [ ] Option to copy all data to clipboard
 - [ ] Option to copy single account data to clipboard
-- [ ] Show summoner Icon
-- [ ] Show summoner Level, Rank/Tier, amount of Champions and more
+- [x] Show summoner Icon
+- [x] Show summoner Level, Rank/Tier
 - [ ] Optional cloud sync
-- [ ] Save login session
-- [ ] Restore login session
-
 
 
 

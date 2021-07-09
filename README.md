@@ -35,6 +35,6 @@ A tool that makes it easier to manage your League of Legends password, made for 
 
 
 #### Disclaimer 📢📢
-`` ⚠️You are encouraged to make backups of your data as this is beta software and an event of data corruption might occur⚠️``
+`` ⚠️You are encouraged to make backups of your account data as this is beta software and an event of data corruption might occur⚠️``
 
 ``This app isn’t endorsed by Riot Games and doesn’t reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends. League of Legends™ and Riot Games are trademarks or registered trademarks of Riot Games, Inc.``

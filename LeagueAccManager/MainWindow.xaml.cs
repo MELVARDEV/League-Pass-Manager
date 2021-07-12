@@ -33,29 +33,6 @@ namespace LeaguePassManager
     /// </summary>
     public partial class MainWindow : Window
     {
-        [DllImport("user32.dll")]
-        internal static extern IntPtr SetForegroundWindow(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        internal static extern bool ShowWindow(IntPtr hWnd, int nCmdShow); //ShowWindow needs an IntPtr
-
-        [DllImport("user32.dll")]
-        static extern bool PostMessage(IntPtr hWnd, UInt32 Msg, int wParam, int lParam);
-        [DllImport("user32.dll")]
-        static extern byte VkKeyScan(char ch);
-
-        //include SendMessage
-        [DllImport("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, string lParam);
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool IsWindowVisible(IntPtr hWnd);
-
-        //include FindWindowEx
-        [DllImport("user32.dll")]
-        public static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
-
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
@@ -88,357 +65,16 @@ namespace LeaguePassManager
             }
         }
 
-
-
-
-
-
-
-        public class Settings
-        {
-
-            public string filePath { get; set; } = "accounts.txt";
-            public bool exitAfterFill { get; set; } = false;
-            public string leagueClientPath { get; set; } = null;
-            public bool autoOpenClient { get; set; } = false;
-            public bool staySignedIn { get; set; } = true;
-            public int launchDelay { get; set; } = 0;
-        }
-
-        public class Region
-        {
-            public string Name { get; set; }
-        }
-
-        public class Account
-        {
-            public Account()
-            {
-                getApiData();
-            }
-
-
-            private string _region = "...";
-            public string Region
-            {
-                get { return _region; }
-                set
-                {
-                    _region = value;
-                    getApiData();
-                    Raise("Region");
-                }
-
-            }
-
-
-            private string _description;
-            public string Description
-            {
-                get { return _description; }
-                set
-                {
-                    _description = value;
-                    Raise("Description");
-
-                }
-            }
-
-            private string _userName;
-            public string UserName
-            {
-                get { return _userName; }
-                set
-                {
-                    _userName = value;
-                    Raise("UserName");
-                }
-            }
-
-            private string _password;
-            public string Password
-            {
-                get { return _password; }
-                set
-                {
-                    _password = value;
-                    Raise("Password");
-                }
-            }
-
-            private string _tier;
-            public string Tier
-            {
-                get { return _tier; }
-                set
-                {
-                    _tier = value;
-                    Raise("Tier");
-                }
-            }
-
-            private string _rank;
-            public string Rank
-            {
-                get { return _rank; }
-                set
-                {
-                    _rank = value;
-                    Raise("Rank");
-                }
-            }
-
-            private string _profileIconId = "1";
-            public string ProfileIconId
-            {
-                get { return _profileIconId; }
-                set
-                {
-                    _profileIconId = value;
-                    getIcon();
-                    Raise("ProfileIconId");
-                }
-            }
-
-            private string _summonerName;
-            public string SummonerName
-            {
-                get { return _summonerName; }
-                set
-                {
-                    _summonerName = value;
-                    getApiData();
-                    Raise("SummonerName");
-                }
-            }
-
-            private int _leaguePoints;
-            public int LeaguePoints
-            {
-                get { return _leaguePoints; }
-                set
-                {
-                    _leaguePoints = value;
-                    Raise("LeaguePoints");
-                }
-            }
-
-            private int _summonerLevel;
-            public int SummonerLevel
-            {
-                get { return _summonerLevel; }
-                set
-                {
-                    _summonerLevel = value;
-                    Raise("SummonerLevel");
-
-                }
-            }
-
-            public string getIcon()
-            {
-                if (string.IsNullOrEmpty(ProfileIconId))
-                {
-                    this.ProfileIconId = "1";
-                }
-
-
-
-                try
-                {
-                    Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "assets"));
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show(e.Message);
-                }
-
-                string path = Path.Combine("assets", $"{ this.ProfileIconId}.jpg");
-                if (File.Exists(path))
-                {
-                    return Path.GetFullPath(path);
-                }
-                else
-                {
-                    using (WebClient myWebClient = new WebClient())
-                    {
-
-                        // Download the Web resource and save it into the current filesystem folder.
-                        myWebClient.DownloadFile($"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/{this.ProfileIconId}.jpg", path);
-                    }
-                    return Path.GetFullPath(path);
-                }
-
-            }
-
-            private string _iconPath;
-            public string iconPath
-            {
-                get
-                {
-
-                    string path = getIcon();
-                    Raise("iconPath");
-
-
-
-                    return path;
-
-
-                }
-                set
-                {
-                    Raise("iconPath");
-                }
-            }
-
-            private string _divPath;
-            public string divPath
-            {
-                get
-                {
-                    if (!string.IsNullOrEmpty(this.Tier))
-                    {
-                        string path = $"assets/Emblem_{this.Tier}.png";
-                        return path;
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-                set { }
-            }
-
-            private string _divString;
-            public string divString
-            {
-                get
-                {
-                    if (!string.IsNullOrEmpty(this.Tier) && !string.IsNullOrEmpty(this.Rank) && !string.IsNullOrEmpty(this.LeaguePoints.ToString()))
-                    {
-                        string div = $"{this.Tier} {this.Rank} {this.LeaguePoints}LP";
-                        return div;
-                    }else if (!string.IsNullOrEmpty(this.Tier))
-                    {
-                        return this.Tier;
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-                set { }
-            }
-
-            private void getApiData()
-            {
-                if (!string.IsNullOrEmpty(this.SummonerName) && !string.IsNullOrEmpty(this.Region) && this.Region != "...")
-                {
-                    Task t = Task.Run(async () =>
-                    {
-                        try
-                        {
-                            HttpClient leagueReq = new HttpClient();
-                            var leagueContent = await leagueReq.GetAsync($"https://express-tp4i3olaqq-ez.a.run.app/riot/league/{this.Region}/{this.SummonerName}");
-
-                            JsonConvert.PopulateObject(await leagueContent.Content.ReadAsStringAsync(), this);
-
-                        }
-                        catch (Exception ex)
-                        {
-
-                            this.Tier = "Unranked";
-
-
-                        }
-
-                        try
-                        {
-                            HttpClient summonerReq = new HttpClient();
-                            var summonerContent = await summonerReq.GetAsync($"https://express-tp4i3olaqq-ez.a.run.app/riot/summoner/{this.Region}/{this.SummonerName}");
-
-
-
-                            JsonConvert.PopulateObject(await summonerContent.Content.ReadAsStringAsync(), this);
-
-                        }
-                        catch (Exception ex)
-                        {
-
-                        }
-
-
-
-
-
-                        getIcon();
-                        Raise("IconPath");
-
-
-
-
-                    });
-
-                    foreach (Window window in Application.Current.Windows)
-                    {
-                        if (window.GetType() == typeof(MainWindow))
-                        {
-                            (window as MainWindow).tasks.Add(t);
-                        }
-                    }
-                }
-            }
-
-            public event PropertyChangedEventHandler PropertyChanged;
-            public void Raise(string propertyName)
-            {
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-
-            }
-
-        }
-
+        //Globals
         public Settings settings = new Settings();
-
-        public List<Account> accounts = new List<Account>();
-
-
-
-
+        public List<LolAccount> accounts = new List<LolAccount>();
         string password;
-
-        bool AllNullOrEmpty(object myObject)
-        {
-            Console.WriteLine("Properties: {0}", myObject.GetType().GetProperties().Count());
-            int nullProperties = 0;
-            int amountOfProperties = myObject.GetType().GetProperties().Count();
-            foreach (PropertyInfo pi in myObject.GetType().GetProperties())
-            {
-                if (pi.PropertyType == typeof(string))
-                {
-                    string value = (string)pi.GetValue(myObject);
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        nullProperties++;
-
-                    }
-                }
-            }
-            if (nullProperties >= amountOfProperties)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-
-        }
         public List<Task> tasks = new List<Task>();
+        // end globals
 
-        void saveAccounts(string password)
+
+        //League of Legends accounts functions
+        void saveLolAccounts(string password)
         {
             Task t = Task.Run(() =>
             {
@@ -456,9 +92,7 @@ namespace LeaguePassManager
             tasks.Add(t);
 
         }
-
-
-        bool readAccounts()
+        bool readLolAccounts()
         {
             string jsonString = "";
             try
@@ -486,7 +120,7 @@ namespace LeaguePassManager
 
 
 
-                accounts = JsonConvert.DeserializeObject<List<Account>>(plaintext);
+                accounts = JsonConvert.DeserializeObject<List<LolAccount>>(plaintext);
 
                 //getApiAccountData(ref accounts);
 
@@ -499,55 +133,29 @@ namespace LeaguePassManager
             }
             return true;
         }
+        // end
 
-        public void saveSettings()
-        {
-            File.WriteAllText("settings.json", JsonConvert.SerializeObject(settings));
-        }
-
-        public void loadSettings()
-        {
-            string settingsJson = "";
-
-            try
-            {
-
-                settingsJson = File.ReadAllText("settings.json");
-                settings = JsonConvert.DeserializeObject<Settings>(settingsJson);
-            }
-            catch (Exception e)
-            {
-                saveSettings();
-                settingsJson = File.ReadAllText("settings.json");
-                settings = JsonConvert.DeserializeObject<Settings>(settingsJson);
-
-            }
-
-            autoOpenClientSwitch.IsChecked = settings.autoOpenClient;
-            exitAfterFillingSwitch.IsChecked = settings.exitAfterFill;
-            staySignedInSwitch.IsChecked = settings.staySignedIn;
-            //delaySlider.Value = Convert.ToDouble(settings.launchDelay);
-            //launchDelayLabel.Content = settings.launchDelay.ToString() + " ms";
-        }
 
 
         public MainWindow()
         {
 
             InitializeComponent();
+
+            //Set up encryption key startup window
             tabControl.Visibility = Visibility.Hidden;
             this.ResizeMode = ResizeMode.NoResize;
             passwordPromptGrid.Visibility = Visibility.Visible;
             Application.Current.MainWindow.Height = 133;
             Application.Current.MainWindow.Width = 260;
+            // -------------------
 
 
-            //settings.filePath = "accounts.txt";
-            loadSettings();
-            passFileLocation.Text = settings.filePath;
+            Settings.load(settings);
+          
 
 
-
+            // Show loading indicator if any taks are running
             Task.Run(async () =>
             {
 
@@ -580,139 +188,18 @@ namespace LeaguePassManager
 
         }
 
-        public void wait(int milliseconds)
-        {
-            var timer1 = new System.Windows.Forms.Timer();
-            if (milliseconds == 0 || milliseconds < 0) return;
+    
 
-            // Console.WriteLine("start wait timer");
-            timer1.Interval = milliseconds;
-            timer1.Enabled = true;
-            timer1.Start();
-
-            timer1.Tick += (s, e) =>
-            {
-                timer1.Enabled = false;
-                timer1.Stop();
-                // Console.WriteLine("stop wait timer");
-            };
-
-            while (timer1.Enabled)
-            {
-
-            }
-        }
-
-        void simulateFill(Process pr)
-        {
-
-            var application = FlaUI.Core.Application.Attach(pr.Id);
-
-
-            var mainWindow = application.GetMainWindow(new UIA3Automation());
-            //mainWindow.FindFirstDescendant();
-
-            FlaUI.Core.Input.Wait.UntilResponsive(mainWindow.FindFirstChild(), TimeSpan.FromMilliseconds(5000));
-
-            // MessageBox.Show(mainWindow.Title);
-
-            ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
-            Account selectedAccount = new Account();
-
-            try
-            {
-                selectedAccount = (Account)datagrid1.SelectedItem;
-            }
-            catch (Exception exce)
-            {
-                MessageBox.Show("You need to select an account first!");
-                this.Show();
-                return;
-            }
-
-
-
-            Account result = accounts.Find(x => x.UserName == selectedAccount.UserName);
-
-            bool tryAgain = true;
-            if (!String.IsNullOrEmpty(result.UserName))
-            {
-                while (tryAgain)
-                {
-                    try
-                    {
-                        mainWindow.FindFirstDescendant(cf.ByName("USERNAME")).AsTextBox().Text = result.UserName;
-
-                        tryAgain = false;
-                    }
-                    catch (Exception e) { }
-                }
-            }
-
-
-            tryAgain = true;
-            if (!String.IsNullOrEmpty(result.Password))
-            {
-                while (tryAgain)
-                {
-                    try
-                    {
-                        mainWindow.FindFirstDescendant(cf.ByName("PASSWORD")).AsTextBox().Text = result.Password;
-                        tryAgain = false;
-                    }
-                    catch (Exception e) { }
-                }
-            }
-
-
-            tryAgain = true;
-            while (tryAgain)
-            {
-                try
-                {
-                    if (mainWindow.FindFirstDescendant(cf.ByName("Stay signed in")).AsCheckBox().IsToggled != settings.staySignedIn)
-                    {
-                        mainWindow.FindFirstDescendant(cf.ByName("Stay signed in")).AsCheckBox().Toggle();
-                    }
-                    tryAgain = false;
-                }
-                catch (Exception e) { }
-            }
-
-
-            tryAgain = true;
-            while (tryAgain)
-            {
-                try
-                {
-
-                    mainWindow.FindFirstDescendant(cf.ByName("Sign in").And(cf.ByControlType(ControlType.Button))).AsButton().Invoke();
-                    tryAgain = false;
-                }
-                catch (Exception e) { }
-            }
-
-
-            if (settings.exitAfterFill)
-            {
-
-                this.Close();
-
-            }
-            return;
-
-
-
-        }
+ 
 
         private async void fillButton_Click(object sender, RoutedEventArgs e)
         {
 
-            Account selectedAccount = new Account();
+            LolAccount selectedAccount = new LolAccount();
             try
             {
-                selectedAccount = (Account)datagrid1.SelectedItem;
-                Account result = accounts.Find(x => x.UserName == selectedAccount.UserName);
+                selectedAccount = (LolAccount)datagrid1.SelectedItem;
+                LolAccount result = accounts.Find(x => x.UserName == selectedAccount.UserName);
             }
             catch (Exception exce)
             {
@@ -728,10 +215,6 @@ namespace LeaguePassManager
 
             }
 
-
-
-
-
             IntPtr hWnd;
             Process[] processRunning = Process.GetProcesses();
             Process leagueClientProcess = null;
@@ -742,18 +225,12 @@ namespace LeaguePassManager
                     leagueClientProcess = pr;
                 }
             }
-
             if (leagueClientProcess != null)
             {
-
-
-                simulateFill(leagueClientProcess);
-
+                AutoFill.lol(leagueClientProcess);
             }
             else if (settings.autoOpenClient)
             {
-
-
                 string sessionFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Riot Games" + Path.DirectorySeparatorChar + "Riot Client" + Path.DirectorySeparatorChar + "Data" + Path.DirectorySeparatorChar + "RiotClientPrivateSettings.yaml");
 
                 try
@@ -804,7 +281,7 @@ namespace LeaguePassManager
                 }
                 await Task.Delay(settings.launchDelay);
                 // MessageBox.Show(pname[0].MainWindowTitle);
-                simulateFill(pname[0]);
+                AutoFill.lol(pname[0]);
             }
             else
             {
@@ -821,7 +298,7 @@ namespace LeaguePassManager
         private async void datagrid1_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
 
-            saveAccounts(password);
+            saveLolAccounts(password);
             try
             {
                 Task t = Task.WhenAll(tasks.ToArray());
@@ -836,7 +313,7 @@ namespace LeaguePassManager
         {
             password = encryptionKey.Password;
 
-            if (readAccounts())
+            if (readLolAccounts())
             {
                 datagrid1.ItemsSource = null;
                 datagrid1.ItemsSource = accounts;
@@ -869,10 +346,10 @@ namespace LeaguePassManager
 
         private void removeButton_Click(object sender, RoutedEventArgs e)
         {
-            Account selectedAccount = new Account();
+            LolAccount selectedAccount = new LolAccount();
             try
             {
-                selectedAccount = (Account)datagrid1.SelectedItem;
+                selectedAccount = (LolAccount)datagrid1.SelectedItem;
             }
             catch (Exception ex)
             {
@@ -891,7 +368,7 @@ namespace LeaguePassManager
         {
 
 
-            saveAccounts(password);
+            saveLolAccounts(password);
 
         }
 
@@ -920,7 +397,7 @@ namespace LeaguePassManager
                 password = newEncryptionKey.Text;
                 Task.Run(() =>
                 {
-                    saveAccounts(password);
+                    saveLolAccounts(password);
                 });
                 newEncryptionKey.Text = "";
                 MessageBox.Show("Encryption key changed successfully.");
@@ -947,7 +424,7 @@ namespace LeaguePassManager
                 }
                 settings.filePath = saveFileDialog.FileName;
                 passFileLocation.Text = saveFileDialog.FileName;
-                saveSettings();
+                settings.save();
 
                 MessageBox.Show("New path saved.");
             }
@@ -967,12 +444,12 @@ namespace LeaguePassManager
         private void exitAfterFillingSwitch_Unchecked(object sender, RoutedEventArgs e)
         {
             settings.exitAfterFill = false;
-            saveSettings();
+            settings.save();
         }
         private void exitAfterFillingSwitch_Checked(object sender, RoutedEventArgs e)
         {
             settings.exitAfterFill = true;
-            saveSettings();
+            settings.save();
         }
 
         private void autoOpenClientSwitch_Checked(object sender, RoutedEventArgs e)
@@ -1005,13 +482,13 @@ namespace LeaguePassManager
 
             }
 
-            saveSettings();
+            settings.save();
         }
 
         private void autoOpenClientSwitch_Unchecked(object sender, RoutedEventArgs e)
         {
             settings.autoOpenClient = false;
-            saveSettings();
+            settings.save();
         }
 
         /*private void delaySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -1026,24 +503,23 @@ namespace LeaguePassManager
 
         private void delaySlider_MouseUp(object sender, MouseButtonEventArgs e)
         {
-
-            saveSettings();
+            settings.save();
         }
 
         private void delaySlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
-            saveSettings();
+            settings.save();
         }
 
         private void staySignedInSwitch_Checked(object sender, RoutedEventArgs e)
         {
             settings.staySignedIn = true;
-            saveSettings();
+            settings.save();
         }
         private void staySignedInSwitch_Unchecked(object sender, RoutedEventArgs e)
         {
             settings.staySignedIn = false;
-            saveSettings();
+            settings.save();
         }
 
         private void closeButton_Click(object sender, RoutedEventArgs e)
@@ -1059,8 +535,6 @@ namespace LeaguePassManager
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             this.Visibility = Visibility.Hidden;
-
-
             tasks.RemoveAll(x => x.IsCompleted);
             Task.WaitAll(tasks.ToArray());
         }

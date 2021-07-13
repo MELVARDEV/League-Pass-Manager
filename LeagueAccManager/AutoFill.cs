@@ -49,7 +49,8 @@ namespace LeaguePassManager
                         {
                             try
                             {
-                                mainWindow.FindFirstDescendant(cf.ByName("USERNAME")).AsTextBox().Text = result.UserName;
+                             
+                                mainWindow.FindFirstDescendant(cf.ByAutomationId("username")).AsTextBox().Text = result.UserName;
                                 tryAgain = false;
                             }
                             catch (Exception e) { }
@@ -63,7 +64,7 @@ namespace LeaguePassManager
                         {
                             try
                             {
-                                mainWindow.FindFirstDescendant(cf.ByName("PASSWORD")).AsTextBox().Text = result.Password;
+                                mainWindow.FindFirstDescendant(cf.ByAutomationId("password")).AsTextBox().Text = result.Password;
                                 tryAgain = false;
                             }
                             catch (Exception e) { }
@@ -75,9 +76,9 @@ namespace LeaguePassManager
                     {
                         try
                         {
-                            if (mainWindow.FindFirstDescendant(cf.ByName("Stay signed in")).AsCheckBox().IsToggled != (window as MainWindow).settings.staySignedIn)
+                            if (mainWindow.FindFirstDescendant(cf.ByAutomationId("remember-me")).AsCheckBox().IsToggled != (window as MainWindow).settings.staySignedIn)
                             {
-                                mainWindow.FindFirstDescendant(cf.ByName("Stay signed in")).AsCheckBox().Toggle();
+                                mainWindow.FindFirstDescendant(cf.ByAutomationId("remember-me")).AsCheckBox().Toggle();
                             }
                             tryAgain = false;
                         }
@@ -89,7 +90,7 @@ namespace LeaguePassManager
                     {
                         try
                         {
-                            mainWindow.FindFirstDescendant(cf.ByName("Sign in").And(cf.ByControlType(ControlType.Button))).AsButton().Invoke();
+                            mainWindow.FindAt(TreeScope.Descendants, 4, cf.ByControlType(ControlType.Button)).AsButton().Invoke();
                             tryAgain = false;
                         }
                         catch (Exception e) { }
@@ -143,7 +144,7 @@ namespace LeaguePassManager
                         {
                             try
                             {
-                                mainWindow.FindFirstDescendant(cf.ByName("USERNAME")).AsTextBox().Text = result.UserName;
+                                mainWindow.FindFirstDescendant(cf.ByAutomationId("username")).AsTextBox().Text = result.UserName;
                                 tryAgain = false;
                             }
                             catch (Exception e) { }
@@ -158,7 +159,7 @@ namespace LeaguePassManager
                         {
                             try
                             {
-                                mainWindow.FindFirstDescendant(cf.ByName("PASSWORD")).AsTextBox().Text = result.Password;
+                                mainWindow.FindFirstDescendant(cf.ByAutomationId("password")).AsTextBox().Text = result.Password;
                                 tryAgain = false;
                             }
                             catch (Exception e) { }
@@ -171,9 +172,9 @@ namespace LeaguePassManager
                     {
                         try
                         {
-                            if (mainWindow.FindFirstDescendant(cf.ByName("Stay signed in")).AsCheckBox().IsToggled != (window as MainWindow).settings.staySignedIn)
+                            if (mainWindow.FindFirstDescendant(cf.ByAutomationId("remember-me")).AsCheckBox().IsToggled != (window as MainWindow).settings.staySignedIn)
                             {
-                                mainWindow.FindFirstDescendant(cf.ByName("Stay signed in")).AsCheckBox().Toggle();
+                                mainWindow.FindFirstDescendant(cf.ByAutomationId("remember-me")).AsCheckBox().Toggle();
                             }
                             tryAgain = false;
                         }
@@ -186,7 +187,7 @@ namespace LeaguePassManager
                     {
                         try
                         {
-                            mainWindow.FindFirstDescendant(cf.ByName("Sign in").And(cf.ByControlType(ControlType.Button))).AsButton().Invoke();
+                            mainWindow.FindAt(TreeScope.Descendants, 4, cf.ByControlType(ControlType.Button)).AsButton().Invoke();
                             tryAgain = false;
                         }
                         catch (Exception e) { }

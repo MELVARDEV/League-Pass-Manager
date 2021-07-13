@@ -80,6 +80,9 @@
   <PropertyGroup>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accessibility" />
     <Reference Include="FlaUI.Core, Version=3.2.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -216,6 +219,6 @@
   </Target>
   <Import Project="..\packages\Interop.UIAutomationClient.10.18362.0\build\Interop.UIAutomationClient.targets" Condition="Exists('..\packages\Interop.UIAutomationClient.10.18362.0\build\Interop.UIAutomationClient.targets')" />
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Release (powershell.exe -Command $null=mkdir '$(SolutionDir)PublishOutput'; Compress-Archive -CompressionLevel Optimal -Path '$(TargetDir)*.dll','$(TargetDir)*.exe', '$(TargetDir)*.config' -DestinationPath '$(SolutionDir)PublishOutput\release.zip' -Force)</PostBuildEvent>
+    <PostBuildEvent>if $(ConfigurationName) == Release (powershell.exe -Command $null=mkdir '$(SolutionDir)PublishOutput'; Remove-Item -Path '$(SolutionDir)PublishOutput\release.zip'; Compress-Archive -CompressionLevel Optimal -Path '$(TargetDir)*.dll','$(TargetDir)*.exe', '$(TargetDir)*.config' -DestinationPath '$(SolutionDir)PublishOutput\release.zip' -Force)</PostBuildEvent>
   </PropertyGroup>
 </Project>

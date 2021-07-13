@@ -335,7 +335,7 @@ namespace LeaguePassManager
             }
             else
             {
-                MessageBox.Show("League of Legends login screen not found...");
+                MessageBox.Show("League of Legends login screen not found... If you want to automatically open the client you can turn on this option in the settings tab");
                 this.Show();
             }
         }
@@ -435,7 +435,7 @@ namespace LeaguePassManager
             }
             else
             {
-                MessageBox.Show("Valorant login screen not found...");
+                MessageBox.Show("Valorant login screen not found... If you want to automatically open the client you can turn on this option in the settings tab");
                 this.Show();
             }
         }

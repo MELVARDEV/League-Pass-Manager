@@ -56,9 +56,9 @@
                 </DockPanel>
                 <Grid  Margin="0,34,0,0">
                     <hc:LoadingCircle x:Name="loadingIndicator" Margin="0,6,10,0" Visibility="Hidden" HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="30"/>
-                    <TabControl x:Name="tabControl"   Style="{StaticResource TabControlCapsuleSolid}" Margin="0,6,0,0" Background="{x:Null}">
+                    <TabControl x:Name="tabControl"   Style="{StaticResource TabControlCapsuleSolid}" Margin="0,6,0,0" Background="{x:Null}" VerticalContentAlignment="Center" UseLayoutRounding="False" SelectedIndex="0">
                         
-                        <TabItem  HorizontalAlignment="Center" Height="20" Header="Accounts" VerticalAlignment="Center" Width="85" Padding="13,0,13,0" >
+                        <TabItem Height="20" Header="LoL Accounts" Padding="16,0" >
                             <Grid >
 
                                 <DataGrid x:Name="datagrid1"  Margin="0,0,0,38" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Visible"  AutoGenerateColumns="False" ItemsSource="{Binding Path=accounts, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" CellEditEnding="datagrid1_CellEditEnding" GridLinesVisibility="None" VerticalGridLinesBrush="#29000000"  RowEditEnding="datagrid1_RowEditEnding" CurrentCellChanged="datagrid1_CurrentCellChanged"  HeadersVisibility="Column"  SelectionChanged="datagrid1_SelectionChanged" CanUserAddRows="True" IsSynchronizedWithCurrentItem="False" ScrollViewer.VerticalScrollBarVisibility="Disabled" CanUserReorderColumns="True" >
@@ -128,25 +128,75 @@
 
                             </Grid>
                         </TabItem>
+                        <TabItem x:Name="valorantTab" Height="20" Header="Valorant Accounts" VerticalAlignment="Top"   >
+                            <Grid >
+
+                                <DataGrid x:Name="dataGridValorant"  Margin="0,0,0,38" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Visible"  AutoGenerateColumns="False" ItemsSource="{Binding Path=valorantAccounts, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" GridLinesVisibility="None" VerticalGridLinesBrush="#29000000"  HeadersVisibility="Column" CanUserAddRows="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" CanUserReorderColumns="True" CellEditEnding="dataGridValorant_CellEditEnding" RowEditEnding="dataGridValorant_RowEditEnding" CurrentCellChanged="dataGridValorant_CurrentCellChanged" >
+                                    <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Player Name"
+                                     x:Name="columnValorantPlayerName" 
+                                                   
+                                     Binding="{Binding Path=PlayerName}"
+                                     IsReadOnly="False">
+                                        </DataGridTextColumn>
+                                        <DataGridTextColumn Header="Login"
+                                     x:Name="columnValorantUserName" 
+                                                   
+                                     Binding="{Binding Path=UserName}"
+                                     IsReadOnly="False">
+                                        </DataGridTextColumn>
+                                        <DataGridTextColumn Header="Password"
+                                     x:Name="columnValorantPassword" 
+                                     Binding="{Binding Path=Password}"
+                                     IsReadOnly="False">
+                                        </DataGridTextColumn>
+                                        <DataGridTextColumn Header="Description"
+                                     x:Name="columnValorantDescription" 
+                                     Binding="{Binding Path=Description}"
+                                     IsReadOnly="False">
+                                        </DataGridTextColumn>
+
+
+
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <Button x:Name="valorantFillBtn" Style="{StaticResource ButtonPrimary}" Margin="8,0,139,4" Content="Fill" VerticalAlignment="Bottom"  HorizontalAlignment="Stretch" Width="auto" Padding="10,6,10,6" HorizontalContentAlignment="Center" Click="valorantFillButton_Click"/>
+                                <Button x:Name="valorantRemoveBtn" Style="{StaticResource ButtonPrimary}" Margin="0,0,4,4" Content="Remove" VerticalAlignment="Bottom" Height="30"  HorizontalAlignment="Right" Width="130" Visibility="Visible" Click="valorantRemoveButton_Click"/>
+
+                            </Grid>
+                        </TabItem>
 
 
 
 
 
-                        <TabItem HorizontalAlignment="Center" Height="20" Header="Options" VerticalAlignment="Center" Width="85">
+                        <TabItem Height="20" Header="Options">
                             <hc:FlexPanel FlexWrap="Wrap" FlowDirection="LeftToRight" AlignItems="Baseline" FlexDirection="Row" UseLayoutRounding="False" AlignContent="Center" ScrollViewer.VerticalScrollBarVisibility="Hidden">
 
-                                <GroupBox HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="55" MinHeight="68" Header="Account data file" Padding="6,6,6,7" UseLayoutRounding="False" Margin="12,12,12,12"  >
+                                <GroupBox HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="55" MinHeight="68" Header="LoL account data file" Padding="6,6,6,7" UseLayoutRounding="False" Margin="12,12,12,12"  >
                                     <hc:SimpleStackPanel>
                                         <TextBox x:Name="passFileLocation" Style="{StaticResource TextBoxExtend}" hc:InfoElement.Title="Location" Width="200" VerticalAlignment="Center" IsEnabled="False"/>
                                         <hc:UniformSpacingPanel Spacing="10">
                                             <Button x:Name="changeAccountLocation" Style="{StaticResource ButtonPrimary}" HorizontalAlignment="Left" Margin="0,7,0,0" Content="Change" VerticalAlignment="Top" Width="90" Click="changeAccountLocation_Click"/>
-                                            <Button Style="{StaticResource ButtonPrimary}" HorizontalAlignment="Right" Margin="0,7,0,0" Content="Show" VerticalAlignment="Top" Width="100"/>
+                                            <Button x:Name="showLoLAccountFile" Style="{StaticResource ButtonPrimary}" HorizontalAlignment="Right" Margin="0,7,0,0" Content="Show" VerticalAlignment="Top" Width="100" Click="showLoLAccountFile_Click"/>
                                         </hc:UniformSpacingPanel>
 
                                     </hc:SimpleStackPanel>
 
                                 </GroupBox>
+                                <GroupBox x:Name="valorantAccountDataOptions" HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="55" MinHeight="68" Header="Valorant account data file" Padding="6,6,6,7" UseLayoutRounding="False" Margin="12,12,12,12"  >
+                                    <hc:SimpleStackPanel>
+                                        <TextBox x:Name="valorantPassFileLocation" Style="{StaticResource TextBoxExtend}" hc:InfoElement.Title="Location" Width="200" VerticalAlignment="Center" IsEnabled="False"/>
+                                        <hc:UniformSpacingPanel Spacing="10">
+                                            <Button x:Name="changeValorantAccountLocation" Style="{StaticResource ButtonPrimary}" HorizontalAlignment="Left" Margin="0,7,0,0" Content="Change" VerticalAlignment="Top" Width="90" Click="changeValorantAccountLocation_Click"/>
+                                            <Button x:Name="showValorantAccountFile" Style="{StaticResource ButtonPrimary}" HorizontalAlignment="Right" Margin="0,7,0,0" Content="Show" VerticalAlignment="Top" Width="100" Click="showValorantAccountFile_Click"/>
+                                        </hc:UniformSpacingPanel>
+
+                                    </hc:SimpleStackPanel>
+
+                                </GroupBox>
+
+
                                 <GroupBox HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="55" MinHeight="68" Header="Encryption key" Padding="6,6,6,7" UseLayoutRounding="False" Margin="12,12,12,12" Grid.Column="1"  >
                                     <hc:SimpleStackPanel>
                                         <TextBox x:Name="newEncryptionKey" Style="{StaticResource TextBoxExtend}" hc:InfoElement.Title="Type in new key" Width="200" VerticalAlignment="Center"/>
@@ -154,7 +204,7 @@
                                     </hc:SimpleStackPanel>
 
                                 </GroupBox>
-                                <GroupBox HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="55" MinHeight="68" Header="Misc" Padding="12,9,12,9" UseLayoutRounding="False" Margin="12,12,12,12" Grid.Column="1" Grid.IsSharedSizeScope="True" MaxWidth="300" Height="145.96"  >
+                                <GroupBox HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="55" MinHeight="68" Header="Misc" Padding="12,9,12,9" UseLayoutRounding="False" Margin="12,12,12,12" Grid.Column="1" Grid.IsSharedSizeScope="True" MaxWidth="300" Height="176"  >
                                     <hc:SimpleStackPanel>
                                         <hc:FlexPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
                                             <ToggleButton x:Name="exitAfterFillingSwitch" Style="{StaticResource ToggleButtonSwitch}" HorizontalContentAlignment="Center" FlowDirection="LeftToRight" Padding="10,0,0,0" Margin="0,0,10,0" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Checked="exitAfterFillingSwitch_Checked" Unchecked="exitAfterFillingSwitch_Unchecked"/>
@@ -167,6 +217,10 @@
                                         <hc:FlexPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
                                             <ToggleButton x:Name="staySignedInSwitch" Style="{StaticResource ToggleButtonSwitch}" HorizontalContentAlignment="Center" FlowDirection="LeftToRight" Padding="10,0,0,0" Margin="0,0,10,0" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Checked="staySignedInSwitch_Checked" Unchecked="staySignedInSwitch_Unchecked"/>
                                             <Label Content="Stay signed in" Background="{x:Null}" BorderThickness="0,0,0,0" FontSize="14" HorizontalAlignment="Center" HorizontalContentAlignment="Center" />
+                                        </hc:FlexPanel>
+                                        <hc:FlexPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+                                            <ToggleButton x:Name="hideValorantSwitch" Style="{StaticResource ToggleButtonSwitch}" HorizontalContentAlignment="Center" FlowDirection="LeftToRight" Padding="10,0,0,0" Margin="0,0,10,0" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Checked="hideValorantSwitch_Checked" Unchecked="hideValorantSwitch_Unchecked"/>
+                                            <Label Content="Hide all Valorant options" Background="{x:Null}" BorderThickness="0,0,0,0" FontSize="14" HorizontalAlignment="Center" HorizontalContentAlignment="Center" />
                                         </hc:FlexPanel>
                                     </hc:SimpleStackPanel>
 

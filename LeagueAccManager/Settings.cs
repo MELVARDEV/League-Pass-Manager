@@ -11,11 +11,13 @@ namespace LeaguePassManager
 {
     public class Settings
     {
-        public string filePath { get; set; } = "accounts.txt";
+        public string lolAccountFilePath { get; set; } = "accounts.txt";
+        public string valorantAccountFilePath { get; set; } = "valorant_accounts.txt";
         public bool exitAfterFill { get; set; } = false;
-        public string leagueClientPath { get; set; } = null;
+        public string riotClientPath { get; set; } = null;
         public bool autoOpenClient { get; set; } = false;
         public bool staySignedIn { get; set; } = true;
+        public bool hideAllValorantOptions { get; set; } = true;
         public int launchDelay { get; set; } = 0;
 
         public void save()
@@ -41,17 +43,30 @@ namespace LeaguePassManager
 
             }
 
-
-            foreach (Window window in Application.Current.Windows)
-            {
-                if (window.GetType() == typeof(MainWindow))
+                foreach (Window window in Application.Current.Windows)
                 {
-                    (window as MainWindow).autoOpenClientSwitch.IsChecked = settings.autoOpenClient;
-                    (window as MainWindow).exitAfterFillingSwitch.IsChecked = settings.exitAfterFill;
-                    (window as MainWindow).staySignedInSwitch.IsChecked = settings.staySignedIn;
-                    (window as MainWindow).passFileLocation.Text = settings.filePath;
+                    if (window.GetType() == typeof(MainWindow))
+                    {
+                        (window as MainWindow).autoOpenClientSwitch.IsChecked = settings.autoOpenClient;
+                        (window as MainWindow).exitAfterFillingSwitch.IsChecked = settings.exitAfterFill;
+                        (window as MainWindow).staySignedInSwitch.IsChecked = settings.staySignedIn;
+                        (window as MainWindow).hideValorantSwitch.IsChecked = settings.hideAllValorantOptions;
+                        (window as MainWindow).passFileLocation.Text = settings.lolAccountFilePath;
+                        (window as MainWindow).valorantPassFileLocation.Text = settings.valorantAccountFilePath;
+                    if (settings.hideAllValorantOptions == true)
+                        {
+                            (window as MainWindow).valorantAccountDataOptions.Visibility = Visibility.Collapsed;
+                            (window as MainWindow).valorantTab.Visibility = Visibility.Collapsed;
+                        }
+                        else
+                        {
+                            (window as MainWindow).valorantAccountDataOptions.Visibility = Visibility.Visible;
+                            (window as MainWindow).valorantTab.Visibility = Visibility.Visible;
+                        }
+                    }
                 }
-            }
+
+          
         }
     }
 }

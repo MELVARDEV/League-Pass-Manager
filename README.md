@@ -27,6 +27,9 @@ A tool that makes it easier to manage your League of Legends and Valorant passwo
 - [x] Show summoner Icon
 - [x] Show summoner Level, Rank/Tier
 - [x] Add Valorant tab
+- [ ] Option to set default launch tab LoL/Valorant
+- [ ] Persistent sorting and column order
+- [ ] More encryption methods
 - [ ] Automatic password file backup
 - [ ] Account export in formatted text
 - [ ] Option to copy all data to clipboard

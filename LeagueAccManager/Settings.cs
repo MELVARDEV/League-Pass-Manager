@@ -31,7 +31,6 @@ namespace LeaguePassManager
 
             try
             {
-
                 settingsJson = File.ReadAllText("settings.json");
                 settings = JsonConvert.DeserializeObject<Settings>(settingsJson);
             }

@@ -138,6 +138,7 @@ namespace LeaguePassManager
 
         public string getIcon()
         {
+          
             if (string.IsNullOrEmpty(ProfileIconId))
             {
                 this.ProfileIconId = "1";
@@ -161,12 +162,16 @@ namespace LeaguePassManager
             }
             else
             {
-                using (WebClient myWebClient = new WebClient())
+                Task.Run(() =>
                 {
+                    using (WebClient myWebClient = new WebClient())
+                    {
 
-                    // Download the Web resource and save it into the current filesystem folder.
-                    myWebClient.DownloadFile($"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/{this.ProfileIconId}.jpg", path);
-                }
+                        // Download the Web resource and save it into the current filesystem folder.
+                        myWebClient.DownloadFile($"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/{this.ProfileIconId}.jpg", path);
+                    }
+                });
+              
                 return Path.GetFullPath(path);
             }
 

@@ -66,11 +66,15 @@ namespace LeaguePassManager
         }
 
         //Globals
-        public Settings settings = new Settings();
-        public List<LolAccount> accounts = new List<LolAccount>();
         string password;
+        public Settings settings = new Settings();
+        public List<LolAccount> lolAccounts = new List<LolAccount>();
+        public List<ValorantAccount> valorantAccounts = new List<ValorantAccount>();
+        
         public List<Task> tasks = new List<Task>();
-        // end globals
+        // ------------------- end globals
+
+
 
 
         //League of Legends accounts functions
@@ -79,12 +83,12 @@ namespace LeaguePassManager
             Task t = Task.Run(() =>
             {
 
-                string jsonList = JsonConvert.SerializeObject(accounts);
+                string jsonList = JsonConvert.SerializeObject(lolAccounts);
                 string aeCiphertext = RijndaelEtM.Encrypt(jsonList, password, KeySize.Aes256);
-                try { File.WriteAllText(settings.filePath, aeCiphertext); }
+                try { File.WriteAllText(settings.lolAccountFilePath, aeCiphertext); }
                 catch (System.UnauthorizedAccessException ex)
                 {
-                    MessageBox.Show("You dont have permission to write to " + settings.filePath + Environment.NewLine + "Change account file location in settings or launch the app as an administrator.");
+                    MessageBox.Show("You dont have permission to write to " + settings.lolAccountFilePath + Environment.NewLine + "Change account file location in settings or launch the app as an administrator.");
                 }
 
             });
@@ -92,16 +96,18 @@ namespace LeaguePassManager
             tasks.Add(t);
 
         }
-        bool readLolAccounts()
+        async Task<bool> readLolAccounts()
         {
             string jsonString = "";
             try
             {
-                jsonString = File.ReadAllText(settings.filePath);
+                using (var reader = File.OpenText(settings.lolAccountFilePath))
+                {
+                    jsonString = await reader.ReadToEndAsync();
+                }
             }
             catch (Exception e)
             {
-                MessageBox.Show("Account file doesn't exist yet and will be created now. Double check your encryption key and memorize it or write it down. You won't be able to access your account data without it!" + Environment.NewLine + Environment.NewLine + "Your encryption key: " + password, "WARNING", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return true;
             }
 
@@ -112,28 +118,90 @@ namespace LeaguePassManager
             }
             catch (Exception e)
             {
-                MessageBox.Show("Wrong decryption phrase");
                 return false;
             }
             try
             {
-
-
-
-                accounts = JsonConvert.DeserializeObject<List<LolAccount>>(plaintext);
-
-                //getApiAccountData(ref accounts);
-
-
+          
+                lolAccounts = JsonConvert.DeserializeObject<List<LolAccount>>(plaintext);
             }
             catch (Exception e)
             {
-                MessageBox.Show("Accounts file corrupted!");
                 return false;
             }
             return true;
         }
-        // end
+        // -------------------  end
+
+
+
+        //Valorant accounts functions
+        void saveValorantAccounts(string password)
+        {
+            Task t = Task.Run(() =>
+            {
+
+                string jsonList = JsonConvert.SerializeObject(valorantAccounts);
+                string aeCiphertext = RijndaelEtM.Encrypt(jsonList, password, KeySize.Aes256);
+                try { File.WriteAllText(settings.valorantAccountFilePath, aeCiphertext); }
+                catch (System.UnauthorizedAccessException ex)
+                {
+                    MessageBox.Show("You dont have permission to write to " + settings.valorantAccountFilePath + Environment.NewLine + "Change account file location in settings or launch the app as an administrator.");
+                }
+
+            });
+            tasks.RemoveAll(x => x.IsCompleted);
+            tasks.Add(t);
+
+        }
+        async Task<bool> readValorantAccounts()
+        {
+            string jsonString = "";
+            try
+            {
+                using (var reader = File.OpenText(settings.valorantAccountFilePath))
+                {
+                    jsonString = await reader.ReadToEndAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                return true;
+            }
+
+            string plaintext = "";
+            try
+            {
+                plaintext = RijndaelEtM.Decrypt(jsonString, password, KeySize.Aes256);
+            }
+            catch (Exception e)
+            {
+                //MessageBox.Show("Wrong Valorant decryption phrase");
+                return false;
+            }
+            try
+            {
+                valorantAccounts = JsonConvert.DeserializeObject<List<ValorantAccount>>(plaintext);
+            }
+            catch (Exception e)
+            {
+                //MessageBox.Show("Valorant account data file is corrupted!");
+                return false;
+            }
+            return true;
+        }
+        //  ------------------- end
+
+
+
+
+        //Shared account functions
+        void saveAllAccounts(string password)
+        {
+            saveLolAccounts(password);
+            saveValorantAccounts(password);
+        }
+        // -------------------- end
 
 
 
@@ -150,11 +218,8 @@ namespace LeaguePassManager
             Application.Current.MainWindow.Width = 260;
             // -------------------
 
-
             Settings.load(settings);
           
-
-
             // Show loading indicator if any taks are running
             Task.Run(async () =>
             {
@@ -199,7 +264,7 @@ namespace LeaguePassManager
             try
             {
                 selectedAccount = (LolAccount)datagrid1.SelectedItem;
-                LolAccount result = accounts.Find(x => x.UserName == selectedAccount.UserName);
+                LolAccount result = lolAccounts.Find(x => x.UserName == selectedAccount.UserName);
             }
             catch (Exception exce)
             {
@@ -248,7 +313,7 @@ namespace LeaguePassManager
 
 
 
-                leagueClientProcess = Process.Start(settings.leagueClientPath, "--launch-product=league_of_legends --launch-patchline=live");
+                leagueClientProcess = Process.Start(settings.riotClientPath, "--launch-product=league_of_legends --launch-patchline=live");
 
 
                 Process[] pname = Process.GetProcessesByName("RiotClientUx");
@@ -295,6 +360,122 @@ namespace LeaguePassManager
         }
 
 
+        private async void valorantFillButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            ValorantAccount selectedAccount = new ValorantAccount();
+            try
+            {
+                selectedAccount = (ValorantAccount)dataGridValorant.SelectedItem;
+                ValorantAccount result = valorantAccounts.Find(x => x.UserName == selectedAccount.UserName);
+            }
+            catch (Exception exce)
+            {
+                MessageBox.Show("You need to select an account first!");
+                return;
+            }
+
+            // Hide window instantly and wait for all tasks to finish before exiting
+            if (settings.exitAfterFill)
+            {
+                this.Hide();
+            }
+
+            IntPtr hWnd;
+            Process[] processRunning = Process.GetProcesses();
+            Process valorantClientProcess = null;
+            foreach (Process pr in processRunning)
+            {
+                if (pr.ProcessName == "RiotClientUx")
+                {
+                    valorantClientProcess = pr;
+                }
+            }
+            if (valorantClientProcess != null)
+            {
+                AutoFill.valorant(valorantClientProcess);
+            }
+            else if (settings.autoOpenClient)
+            {
+                while (String.IsNullOrWhiteSpace(settings.riotClientPath))
+                {
+
+                    OpenFileDialog openFileDialog = new OpenFileDialog();
+                    openFileDialog.AddExtension = true;
+                    openFileDialog.DefaultExt = "exe";
+                    openFileDialog.Filter = "RiotClientServices.exe|RiotClientServices.exe";
+                    if (openFileDialog.ShowDialog() == true)
+                    {
+
+                        settings.riotClientPath = openFileDialog.FileName;
+                        settings.save();
+
+                    }
+                }
+                string sessionFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Riot Games" + Path.DirectorySeparatorChar + "Riot Client" + Path.DirectorySeparatorChar + "Data" + Path.DirectorySeparatorChar + "RiotClientPrivateSettings.yaml");
+
+                try
+                {
+                    File.Delete(sessionFilePath);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Cannot Delete");
+                    this.Show();
+                    Console.WriteLine(ex.Message);
+                }
+
+
+
+
+
+                valorantClientProcess = Process.Start(settings.riotClientPath, "--launch-product=valorant --launch-patchline=live");
+
+
+                Process[] pname = Process.GetProcessesByName("RiotClientUx");
+                while (pname.Length == 0)
+                {
+                    await Task.Delay(200);
+                    pname = Process.GetProcessesByName("RiotClientUx");
+                }
+
+
+
+                // MessageBox.Show(leagueClientProcess.Id.ToString());
+
+
+
+                var mainWindowTitle = pname[0].MainWindowTitle;
+                while (mainWindowTitle != "Riot Client")
+                {
+                    await Task.Delay(200);
+                    Process[] proc = Process.GetProcessesByName("RiotClientUx");
+                    while (proc.Length == 0)
+                    {
+                        proc = Process.GetProcessesByName("RiotClientUx");
+                    }
+                    mainWindowTitle = proc[0].MainWindowTitle;
+                    if (proc[0].MainWindowTitle == "Riot Client")
+                    {
+                        pname[0] = proc[0];
+                    }
+                }
+                await Task.Delay(settings.launchDelay);
+                // MessageBox.Show(pname[0].MainWindowTitle);
+                AutoFill.valorant(pname[0]);
+            }
+            else
+            {
+                MessageBox.Show("Valorant login screen not found...");
+
+                this.Show();
+            }
+
+
+
+        }
+
+
         private async void datagrid1_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
 
@@ -309,31 +490,79 @@ namespace LeaguePassManager
 
         }
 
+        private async void dataGridValorant_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+
+            saveValorantAccounts(password);
+            try
+            {
+                Task t = Task.WhenAll(tasks.ToArray());
+                await t;
+                dataGridValorant.Items.Refresh();
+            }
+            catch (Exception ex) { }
+
+        }
+
+   
+
         private void unlockButton_Click(object sender, RoutedEventArgs e)
         {
             password = encryptionKey.Password;
 
-            if (readLolAccounts())
+            Task t = Task.Run(() =>
             {
-                datagrid1.ItemsSource = null;
-                datagrid1.ItemsSource = accounts;
-                datagrid1.Items.Refresh();
-                this.ResizeMode = ResizeMode.CanResize;
+                this.Dispatcher.Invoke(async () =>
+                {
+                    bool readLolSuccess = await readLolAccounts();
+                    if (readLolSuccess)
+                    {
+                            datagrid1.ItemsSource = null;
+                            datagrid1.ItemsSource = lolAccounts;
+                            datagrid1.Items.Refresh();
+                            this.ResizeMode = ResizeMode.CanResize;
+                            
+                            passwordPromptGrid.Visibility = Visibility.Hidden;
+                            Application.Current.MainWindow.Height = 500;
+                            Application.Current.MainWindow.Width = 846;
+                            Helpers.CenterWindowOnScreen(this);
+                            tabControl.Visibility = Visibility.Visible;
+                  
 
-                passwordPromptGrid.Visibility = Visibility.Hidden;
-                Application.Current.MainWindow.Height = 500;
-                Application.Current.MainWindow.Width = 846;
+                    }
 
-                tabControl.Visibility = Visibility.Visible;
-            }
+                    bool readValSuccess = await readValorantAccounts();
+                    if (readValSuccess)
+                    {
 
+                  
+                            dataGridValorant.ItemsSource = null;
+                            dataGridValorant.ItemsSource = valorantAccounts;
+                            dataGridValorant.Items.Refresh();
+                            this.ResizeMode = ResizeMode.CanResize;
+
+                            passwordPromptGrid.Visibility = Visibility.Hidden;
+                            Application.Current.MainWindow.Height = 500;
+                            Application.Current.MainWindow.Width = 846;
+                            Helpers.CenterWindowOnScreen(this);
+                            tabControl.Visibility = Visibility.Visible;
+
+                
+
+                    }
+
+                    if (!readValSuccess && !readLolSuccess)
+                    {
+                        MessageBox.Show("Wrong encryption key!");
+                    }
+                });
+               
+            });
+            
         }
 
         private async void datagrid1_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
         {
-
-            //saveAccounts(password);
-
             try
             {
                 Task t = Task.WhenAll(tasks.ToArray());
@@ -341,7 +570,17 @@ namespace LeaguePassManager
                 datagrid1.Items.Refresh();
             }
             catch (Exception ex) { }
-            // MessageBox.Show("Row edit ending");
+        }
+
+        private async void dataGridValorant_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
+        {
+            try
+            {
+                Task t = Task.WhenAll(tasks.ToArray());
+                await t;
+                dataGridValorant.Items.Refresh();
+            }
+            catch (Exception ex) { }
         }
 
         private void removeButton_Click(object sender, RoutedEventArgs e)
@@ -359,24 +598,47 @@ namespace LeaguePassManager
 
             if (MessageBox.Show("Are you sure you want to remove this account: " + selectedAccount.UserName + "?", "Remove Account", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
-                accounts.RemoveAll(a => a == selectedAccount);
+                lolAccounts.RemoveAll(a => a == selectedAccount);
+                saveLolAccounts(password);
                 datagrid1.Items.Refresh();
+            }
+        }
+        private void valorantRemoveButton_Click(object sender, RoutedEventArgs e)
+        {
+            ValorantAccount selectedAccount = new ValorantAccount();
+            try
+            {
+                selectedAccount = (ValorantAccount)dataGridValorant.SelectedItem;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Select an account first!");
+                return;
+            }
+
+            if (MessageBox.Show("Are you sure you want to remove this account: " + selectedAccount.UserName + "?", "Remove Account", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            {
+                valorantAccounts.RemoveAll(a => a == selectedAccount);
+                saveValorantAccounts(password);
+                dataGridValorant.Items.Refresh();
             }
         }
 
         private void datagrid1_CurrentCellChanged(object sender, EventArgs e)
         {
-
-
             saveLolAccounts(password);
+        }
 
+        private void dataGridValorant_CurrentCellChanged(object sender, EventArgs e)
+        {
+            saveValorantAccounts(password);
         }
 
         private void copyDataToClipboardBtn_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBox.Show("Are you sure you want to copy all data in PLAIN TEXT to the clipboard?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
-                string jsonString = JsonConvert.SerializeObject(accounts);
+                string jsonString = JsonConvert.SerializeObject(lolAccounts);
 
                 Clipboard.SetText(jsonString);
                 MessageBox.Show("Data copied to clipboard.");
@@ -397,7 +659,7 @@ namespace LeaguePassManager
                 password = newEncryptionKey.Text;
                 Task.Run(() =>
                 {
-                    saveLolAccounts(password);
+                    saveAllAccounts(password);
                 });
                 newEncryptionKey.Text = "";
                 MessageBox.Show("Encryption key changed successfully.");
@@ -416,13 +678,13 @@ namespace LeaguePassManager
             {
                 try
                 {
-                    File.Move(settings.filePath, saveFileDialog.FileName);
+                    File.Move(settings.lolAccountFilePath, saveFileDialog.FileName);
                 }
                 catch (Exception excep)
                 {
 
                 }
-                settings.filePath = saveFileDialog.FileName;
+                settings.lolAccountFilePath = saveFileDialog.FileName;
                 passFileLocation.Text = saveFileDialog.FileName;
                 settings.save();
 
@@ -455,7 +717,7 @@ namespace LeaguePassManager
         private void autoOpenClientSwitch_Checked(object sender, RoutedEventArgs e)
         {
 
-            if (String.IsNullOrWhiteSpace(settings.leagueClientPath) && tabControl.SelectedIndex == 1 && autoOpenClientSwitch.IsChecked == true)
+            if (String.IsNullOrWhiteSpace(settings.riotClientPath) && tabControl.SelectedIndex == 1 && autoOpenClientSwitch.IsChecked == true)
             {
 
                 OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -465,7 +727,7 @@ namespace LeaguePassManager
                 if (openFileDialog.ShowDialog() == true)
                 {
 
-                    settings.leagueClientPath = openFileDialog.FileName;
+                    settings.riotClientPath = openFileDialog.FileName;
                     settings.autoOpenClient = true;
                     autoOpenClientSwitch.IsChecked = true;
 
@@ -488,26 +750,6 @@ namespace LeaguePassManager
         private void autoOpenClientSwitch_Unchecked(object sender, RoutedEventArgs e)
         {
             settings.autoOpenClient = false;
-            settings.save();
-        }
-
-        /*private void delaySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (tabControl.SelectedIndex == 1)
-            {
-                settings.launchDelay = Convert.ToInt32(delaySlider.Value);
-                launchDelayLabel.Content = String.Concat(settings.launchDelay.ToString(), " ms");
-            }
-
-        }*/
-
-        private void delaySlider_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            settings.save();
-        }
-
-        private void delaySlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
-        {
             settings.save();
         }
 
@@ -539,6 +781,64 @@ namespace LeaguePassManager
             Task.WaitAll(tasks.ToArray());
         }
 
+        private void hideValorantSwitch_Checked(object sender, RoutedEventArgs e)
+        {
+            settings.hideAllValorantOptions = true;
+            valorantAccountDataOptions.Visibility = Visibility.Collapsed;
+            valorantTab.Visibility = Visibility.Collapsed;
+            settings.save();
+        }
+        private void hideValorantSwitch_Unchecked(object sender, RoutedEventArgs e)
+        {
+            settings.hideAllValorantOptions = false;
+            valorantAccountDataOptions.Visibility = Visibility.Visible;
+            valorantTab.Visibility = Visibility.Visible;
+            settings.save();
+        }
 
+        private void changeValorantAccountLocation_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.AddExtension = true;
+            saveFileDialog.DefaultExt = "txt";
+            saveFileDialog.Filter = "Text file (*.txt)|*.txt";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    File.Move(settings.valorantAccountFilePath, saveFileDialog.FileName);
+                }
+                catch (Exception excep)
+                {
+
+                }
+                settings.valorantAccountFilePath = saveFileDialog.FileName;
+                valorantPassFileLocation.Text = saveFileDialog.FileName;
+                settings.save();
+
+                MessageBox.Show("New path saved.");
+            }
+        }
+
+        private void showLoLAccountFile_Click(object sender, RoutedEventArgs e)
+        {
+            string filePath = settings.lolAccountFilePath;
+            if (!File.Exists(filePath))
+            {
+                return;
+            }
+            string argument = "/select, \"" + filePath + "\"";
+            System.Diagnostics.Process.Start("explorer.exe", argument);
+        }
+        private void showValorantAccountFile_Click(object sender, RoutedEventArgs e)
+        {
+            string filePath = settings.valorantAccountFilePath;
+            if (!File.Exists(filePath))
+            {
+                return;
+            }
+            string argument = "/select, \"" + filePath + "\"";
+            System.Diagnostics.Process.Start("explorer.exe", argument);
+        }
     }
 }

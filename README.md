@@ -1,5 +1,5 @@
 # League-Pass-Manager 🔑
-A tool that makes it easier to manage your League of Legends password, made for people who use infamous password storage method -> "accounts.txt" on the desktop.
+A tool that makes it easier to manage your League of Legends and Valorant passwords, made for people who use infamous password storage method -> "accounts.txt" on the desktop.
 
 ![Screenshot](https://user-images.githubusercontent.com/36396619/125109347-86481100-e0e3-11eb-9102-4ea4c95be81c.png)
 
@@ -26,7 +26,7 @@ A tool that makes it easier to manage your League of Legends password, made for 
 - [x] Option to change encryption key
 - [x] Show summoner Icon
 - [x] Show summoner Level, Rank/Tier
-- [ ] Add Valorant tab
+- [x] Add Valorant tab
 - [ ] Automatic password file backup
 - [ ] Account export in formatted text
 - [ ] Option to copy all data to clipboard

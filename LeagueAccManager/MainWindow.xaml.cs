@@ -219,6 +219,7 @@ namespace LeaguePassManager
             // -------------------
 
             Settings.load(settings);
+            Settings.findRiotClientPath(settings);
           
             // Show loading indicator if any taks are running
             Task.Run(async () =>
@@ -251,6 +252,22 @@ namespace LeaguePassManager
                 }
             });
 
+        }
+
+        void riotClientPathDialog()
+        {
+            while (String.IsNullOrWhiteSpace(settings.riotClientPath))
+            {
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.AddExtension = true;
+                openFileDialog.DefaultExt = "exe";
+                openFileDialog.Filter = "RiotClientServices.exe|RiotClientServices.exe";
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    settings.riotClientPath = openFileDialog.FileName;
+                    settings.save();
+                }
+            }
         }
 
         private async void fillButton_Click(object sender, RoutedEventArgs e)
@@ -292,6 +309,12 @@ namespace LeaguePassManager
             }
             else if (settings.autoOpenClient)
             {
+                if (string.IsNullOrEmpty(settings.riotClientPath))
+                {
+                    riotClientPathDialog();
+                }
+             
+
                 string sessionFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Riot Games" + Path.DirectorySeparatorChar + "Riot Client" + Path.DirectorySeparatorChar + "Data" + Path.DirectorySeparatorChar + "RiotClientPrivateSettings.yaml");
 
                 try
@@ -305,7 +328,15 @@ namespace LeaguePassManager
                     Console.WriteLine(ex.Message);
                 }
 
-                leagueClientProcess = Process.Start(settings.riotClientPath, "--launch-product=league_of_legends --launch-patchline=live");
+                try
+                {
+                    leagueClientProcess = Process.Start(settings.riotClientPath, "--launch-product=league_of_legends --launch-patchline=live");
+                }
+                catch (Exception ex)
+                {
+                    riotClientPathDialog();
+                    leagueClientProcess = Process.Start(settings.riotClientPath, "--launch-product=league_of_legends --launch-patchline=live");
+                }
 
                 Process[] pname = Process.GetProcessesByName("RiotClientUx");
                 while (pname.Length == 0)
@@ -378,20 +409,9 @@ namespace LeaguePassManager
             }
             else if (settings.autoOpenClient)
             {
-                while (String.IsNullOrWhiteSpace(settings.riotClientPath))
+                if (string.IsNullOrEmpty(settings.riotClientPath))
                 {
-
-                    OpenFileDialog openFileDialog = new OpenFileDialog();
-                    openFileDialog.AddExtension = true;
-                    openFileDialog.DefaultExt = "exe";
-                    openFileDialog.Filter = "RiotClientServices.exe|RiotClientServices.exe";
-                    if (openFileDialog.ShowDialog() == true)
-                    {
-
-                        settings.riotClientPath = openFileDialog.FileName;
-                        settings.save();
-
-                    }
+                    riotClientPathDialog();
                 }
                 string sessionFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Riot Games" + Path.DirectorySeparatorChar + "Riot Client" + Path.DirectorySeparatorChar + "Data" + Path.DirectorySeparatorChar + "RiotClientPrivateSettings.yaml");
 
@@ -406,7 +426,15 @@ namespace LeaguePassManager
                     Console.WriteLine(ex.Message);
                 }
 
-                valorantClientProcess = Process.Start(settings.riotClientPath, "--launch-product=valorant --launch-patchline=live");
+                try
+                {
+                    valorantClientProcess = Process.Start(settings.riotClientPath, "--launch-product=valorant --launch-patchline=live");
+                }
+                catch (Exception ex)
+                {
+                    riotClientPathDialog();
+                    valorantClientProcess = Process.Start(settings.riotClientPath, "--launch-product=valorant --launch-patchline=live");
+                }
 
                 Process[] pname = Process.GetProcessesByName("RiotClientUx");
                 while (pname.Length == 0)

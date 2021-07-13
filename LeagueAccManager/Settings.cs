@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Win32;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,6 +24,44 @@ namespace LeaguePassManager
         public void save()
         {
             File.WriteAllText("settings.json", JsonConvert.SerializeObject(this));
+        }
+
+        public static void findRiotClientPath(Settings settings)
+        {
+            // Try to detect RiotClientServices.exe location
+            if (string.IsNullOrEmpty(settings.riotClientPath))
+            {
+
+                string valueName = "UninstallString";
+                string lolKey = "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Riot Game league_of_legends.live";
+                string valorantKey = "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Riot Game valorant.live";
+
+                try
+                {
+                    using (RegistryKey key = Registry.CurrentUser.OpenSubKey(lolKey))
+                    {
+                        if (key != null)
+                        {
+                            string uninstallString = (string)key.GetValue(valueName);
+                            string path = uninstallString.Split('"')[1];
+                            settings.riotClientPath = path;
+                            settings.save();
+                        }
+                        else
+                        {
+                            using (RegistryKey valKey = Registry.CurrentUser.OpenSubKey(valorantKey))
+                            {
+                                string uninstallString = (string)valKey.GetValue(valueName);
+                                string path = uninstallString.Split('"')[1];
+                                settings.riotClientPath = path;
+                                settings.save();
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex) { }
+
+            }
         }
 
         public static void load(Settings settings)
@@ -65,7 +104,9 @@ namespace LeaguePassManager
                     }
                 }
 
-          
+
+
+
         }
     }
 }

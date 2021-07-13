@@ -166,8 +166,7 @@ namespace LeaguePassManager
                 {
                     using (WebClient myWebClient = new WebClient())
                     {
-
-                        // Download the Web resource and save it into the current filesystem folder.
+                        // Download icon
                         myWebClient.DownloadFile($"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/{this.ProfileIconId}.jpg", path);
                     }
                 });
@@ -182,15 +181,9 @@ namespace LeaguePassManager
         {
             get
             {
-
                 string path = getIcon();
                 Raise("iconPath");
-
-
-
                 return path;
-
-
             }
             set
             {
@@ -248,43 +241,25 @@ namespace LeaguePassManager
                     {
                         HttpClient leagueReq = new HttpClient();
                         var leagueContent = await leagueReq.GetAsync($"https://express-tp4i3olaqq-ez.a.run.app/riot/league/{this.Region}/{this.SummonerName}");
-
                         JsonConvert.PopulateObject(await leagueContent.Content.ReadAsStringAsync(), this);
-
                     }
                     catch (Exception ex)
                     {
-
                         this.Tier = "Unranked";
-
-
                     }
 
                     try
                     {
                         HttpClient summonerReq = new HttpClient();
                         var summonerContent = await summonerReq.GetAsync($"https://express-tp4i3olaqq-ez.a.run.app/riot/summoner/{this.Region}/{this.SummonerName}");
-
-
-
                         JsonConvert.PopulateObject(await summonerContent.Content.ReadAsStringAsync(), this);
-
                     }
                     catch (Exception ex)
                     {
-
                     }
-
-
-
-
 
                     getIcon();
                     Raise("IconPath");
-
-
-
-
                 });
 
                 foreach (Window window in Application.Current.Windows)

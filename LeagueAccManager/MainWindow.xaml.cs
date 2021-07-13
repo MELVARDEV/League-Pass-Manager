@@ -253,10 +253,6 @@ namespace LeaguePassManager
 
         }
 
-    
-
- 
-
         private async void fillButton_Click(object sender, RoutedEventArgs e)
         {
 
@@ -309,12 +305,7 @@ namespace LeaguePassManager
                     Console.WriteLine(ex.Message);
                 }
 
-
-
-
-
                 leagueClientProcess = Process.Start(settings.riotClientPath, "--launch-product=league_of_legends --launch-patchline=live");
-
 
                 Process[] pname = Process.GetProcessesByName("RiotClientUx");
                 while (pname.Length == 0)
@@ -322,12 +313,6 @@ namespace LeaguePassManager
                     await Task.Delay(200);
                     pname = Process.GetProcessesByName("RiotClientUx");
                 }
-
-
-
-                // MessageBox.Show(leagueClientProcess.Id.ToString());
-
-
 
                 var mainWindowTitle = pname[0].MainWindowTitle;
                 while (mainWindowTitle != "Riot Client")
@@ -351,12 +336,8 @@ namespace LeaguePassManager
             else
             {
                 MessageBox.Show("League of Legends login screen not found...");
-
                 this.Show();
             }
-
-
-
         }
 
 
@@ -425,12 +406,7 @@ namespace LeaguePassManager
                     Console.WriteLine(ex.Message);
                 }
 
-
-
-
-
                 valorantClientProcess = Process.Start(settings.riotClientPath, "--launch-product=valorant --launch-patchline=live");
-
 
                 Process[] pname = Process.GetProcessesByName("RiotClientUx");
                 while (pname.Length == 0)
@@ -438,12 +414,6 @@ namespace LeaguePassManager
                     await Task.Delay(200);
                     pname = Process.GetProcessesByName("RiotClientUx");
                 }
-
-
-
-                // MessageBox.Show(leagueClientProcess.Id.ToString());
-
-
 
                 var mainWindowTitle = pname[0].MainWindowTitle;
                 while (mainWindowTitle != "Riot Client")
@@ -461,24 +431,17 @@ namespace LeaguePassManager
                     }
                 }
                 await Task.Delay(settings.launchDelay);
-                // MessageBox.Show(pname[0].MainWindowTitle);
                 AutoFill.valorant(pname[0]);
             }
             else
             {
                 MessageBox.Show("Valorant login screen not found...");
-
                 this.Show();
             }
-
-
-
         }
-
 
         private async void datagrid1_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-
             saveLolAccounts(password);
             try
             {
@@ -487,12 +450,10 @@ namespace LeaguePassManager
                 datagrid1.Items.Refresh();
             }
             catch (Exception ex) { }
-
         }
 
         private async void dataGridValorant_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-
             saveValorantAccounts(password);
             try
             {
@@ -501,10 +462,7 @@ namespace LeaguePassManager
                 dataGridValorant.Items.Refresh();
             }
             catch (Exception ex) { }
-
         }
-
-   
 
         private void unlockButton_Click(object sender, RoutedEventArgs e)
         {
@@ -527,15 +485,11 @@ namespace LeaguePassManager
                             Application.Current.MainWindow.Width = 846;
                             Helpers.CenterWindowOnScreen(this);
                             tabControl.Visibility = Visibility.Visible;
-                  
-
                     }
 
                     bool readValSuccess = await readValorantAccounts();
                     if (readValSuccess)
                     {
-
-                  
                             dataGridValorant.ItemsSource = null;
                             dataGridValorant.ItemsSource = valorantAccounts;
                             dataGridValorant.Items.Refresh();
@@ -546,9 +500,6 @@ namespace LeaguePassManager
                             Application.Current.MainWindow.Width = 846;
                             Helpers.CenterWindowOnScreen(this);
                             tabControl.Visibility = Visibility.Visible;
-
-                
-
                     }
 
                     if (!readValSuccess && !readLolSuccess)
@@ -556,9 +507,7 @@ namespace LeaguePassManager
                         MessageBox.Show("Wrong encryption key!");
                     }
                 });
-               
             });
-            
         }
 
         private async void datagrid1_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
@@ -702,12 +651,12 @@ namespace LeaguePassManager
 
         }
 
-
         private void exitAfterFillingSwitch_Unchecked(object sender, RoutedEventArgs e)
         {
             settings.exitAfterFill = false;
             settings.save();
         }
+
         private void exitAfterFillingSwitch_Checked(object sender, RoutedEventArgs e)
         {
             settings.exitAfterFill = true;
@@ -716,21 +665,17 @@ namespace LeaguePassManager
 
         private void autoOpenClientSwitch_Checked(object sender, RoutedEventArgs e)
         {
-
             if (String.IsNullOrWhiteSpace(settings.riotClientPath) && tabControl.SelectedIndex == 1 && autoOpenClientSwitch.IsChecked == true)
             {
-
                 OpenFileDialog openFileDialog = new OpenFileDialog();
                 openFileDialog.AddExtension = true;
                 openFileDialog.DefaultExt = "exe";
                 openFileDialog.Filter = "RiotClientServices.exe|RiotClientServices.exe";
                 if (openFileDialog.ShowDialog() == true)
                 {
-
                     settings.riotClientPath = openFileDialog.FileName;
                     settings.autoOpenClient = true;
                     autoOpenClientSwitch.IsChecked = true;
-
                 }
                 else
                 {
@@ -741,9 +686,7 @@ namespace LeaguePassManager
             else
             {
                 settings.autoOpenClient = (bool)autoOpenClientSwitch.IsChecked;
-
             }
-
             settings.save();
         }
 
@@ -810,12 +753,10 @@ namespace LeaguePassManager
                 }
                 catch (Exception excep)
                 {
-
                 }
                 settings.valorantAccountFilePath = saveFileDialog.FileName;
                 valorantPassFileLocation.Text = saveFileDialog.FileName;
                 settings.save();
-
                 MessageBox.Show("New path saved.");
             }
         }

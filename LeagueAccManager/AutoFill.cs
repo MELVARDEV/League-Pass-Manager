@@ -29,8 +29,6 @@ namespace LeaguePassManager
             {
                 if (window.GetType() == typeof(MainWindow))
                 {
-              
-
                     try
                     {
                         selectedAccount = (LolAccount)(window as MainWindow).datagrid1.SelectedItem;
@@ -52,13 +50,11 @@ namespace LeaguePassManager
                             try
                             {
                                 mainWindow.FindFirstDescendant(cf.ByName("USERNAME")).AsTextBox().Text = result.UserName;
-
                                 tryAgain = false;
                             }
                             catch (Exception e) { }
                         }
                     }
-
 
                     tryAgain = true;
                     if (!String.IsNullOrEmpty(result.Password))
@@ -74,7 +70,6 @@ namespace LeaguePassManager
                         }
                     }
 
-
                     tryAgain = true;
                     while (tryAgain)
                     {
@@ -89,13 +84,11 @@ namespace LeaguePassManager
                         catch (Exception e) { }
                     }
 
-
                     tryAgain = true;
                     while (tryAgain)
                     {
                         try
                         {
-
                             mainWindow.FindFirstDescendant(cf.ByName("Sign in").And(cf.ByControlType(ControlType.Button))).AsButton().Invoke();
                             tryAgain = false;
                         }
@@ -130,8 +123,6 @@ namespace LeaguePassManager
             {
                 if (window.GetType() == typeof(MainWindow))
                 {
-
-
                     try
                     {
                         selectedAccount = (ValorantAccount)(window as MainWindow).dataGridValorant.SelectedItem;
@@ -153,7 +144,6 @@ namespace LeaguePassManager
                             try
                             {
                                 mainWindow.FindFirstDescendant(cf.ByName("USERNAME")).AsTextBox().Text = result.UserName;
-
                                 tryAgain = false;
                             }
                             catch (Exception e) { }
@@ -196,7 +186,6 @@ namespace LeaguePassManager
                     {
                         try
                         {
-
                             mainWindow.FindFirstDescendant(cf.ByName("Sign in").And(cf.ByControlType(ControlType.Button))).AsButton().Invoke();
                             tryAgain = false;
                         }
@@ -206,9 +195,7 @@ namespace LeaguePassManager
 
                     if ((window as MainWindow).settings.exitAfterFill)
                     {
-
                         (window as MainWindow).Close();
-
                     }
                     return;
 

@@ -90,7 +90,7 @@ namespace LeaguePassManager
                     {
                         try
                         {
-                            mainWindow.FindAt(TreeScope.Descendants, 4, cf.ByControlType(ControlType.Button)).AsButton().Invoke();
+                            mainWindow.FindAt(TreeScope.Descendants, 3, cf.ByControlType(ControlType.Button)).AsButton().Invoke();
                             tryAgain = false;
                         }
                         catch (Exception e) { }

@@ -346,7 +346,7 @@ namespace LeaguePassManager
                 }
 
                 var mainWindowTitle = pname[0].MainWindowTitle;
-                while (mainWindowTitle != "Riot Client")
+                while (mainWindowTitle != "Riot Client Main")
                 {
                     await Task.Delay(200);
                     Process[] proc = Process.GetProcessesByName("RiotClientUx");

@@ -1,0 +1,10 @@
+Riot Games API is rate-limited and needs an authorized API key to access the limited endpoints. This inelegant code allows requests to be cached to a database, avoiding rate-limiting blocks without exposing the API key.
+
+I am publishing this API source code for transparency reasons only and don't guarantee that it will work in case you want to deploy it yourself.
+In case you do, though, you need to include the following environment variables:
+"riot_api_key", "DB_CONNECT"
+
+Riot Games API key can be obtained here (need to request full access key to increase rate-limiting):
+https://developer.riotgames.com/
+
+"DB_CONNECT" is your MongoDB connection string.

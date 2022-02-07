@@ -506,13 +506,6 @@ namespace LeaguePassManager
                             datagrid1.ItemsSource = null;
                             datagrid1.ItemsSource = lolAccounts;
                             datagrid1.Items.Refresh();
-                            this.ResizeMode = ResizeMode.CanResize;
-                            
-                            passwordPromptGrid.Visibility = Visibility.Hidden;
-                            Application.Current.MainWindow.Height = 500;
-                            Application.Current.MainWindow.Width = 846;
-                            Helpers.CenterWindowOnScreen(this);
-                            tabControl.Visibility = Visibility.Visible;
                     }
 
                     bool readValSuccess = await readValorantAccounts();
@@ -521,18 +514,19 @@ namespace LeaguePassManager
                             dataGridValorant.ItemsSource = null;
                             dataGridValorant.ItemsSource = valorantAccounts;
                             dataGridValorant.Items.Refresh();
-                            this.ResizeMode = ResizeMode.CanResize;
-
-                            passwordPromptGrid.Visibility = Visibility.Hidden;
-                            Application.Current.MainWindow.Height = 500;
-                            Application.Current.MainWindow.Width = 846;
-                            Helpers.CenterWindowOnScreen(this);
-                            tabControl.Visibility = Visibility.Visible;
                     }
 
-                    if (!readValSuccess && !readLolSuccess)
+                    if (!readValSuccess || !readLolSuccess)
                     {
                         MessageBox.Show("Wrong encryption key!");
+                    } else
+                    {
+                        this.ResizeMode = ResizeMode.CanResize;
+                        passwordPromptGrid.Visibility = Visibility.Hidden;
+                        Application.Current.MainWindow.Height = 500;
+                        Application.Current.MainWindow.Width = 846;
+                        tabControl.Visibility = Visibility.Visible;
+                        Helpers.CenterWindowOnScreen(this);
                     }
                 });
             });

@@ -14,6 +14,9 @@ A tool that makes it easier to manage your League of Legends and Valorant passwo
 - Shows Rank/Division and current level for stored accounts
 - You can save data such as account region, username, password and a description for each account
 
+### Disclaimer 📢
+In some cases, the app won't launch unless started as an administrator.
+
 ## How to use ℹ️
 1. Extract the app to a desired location
 1. Create a shortcut to League Pass Manager.exe on your desktop if you wish to

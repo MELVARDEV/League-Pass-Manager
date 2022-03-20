@@ -23,6 +23,9 @@ In some cases, the app won't launch unless started as an administrator.
 1. Run the program and type in your encryption key / password that you will use each time you open the app. Remember the key or write it down somewhere safe as losing it will result in losing all saved account data.
 1. Add an account by clicking on the first empty row and filling in the data
 2. Your summoner data will be shown after you fill in `region` and `summoner name` fields
+
+## Additional information ℹ
+- Please create an issue if something is not working correctly. I am not actively monitoring if everyting works correctly, but I will address issues when possible.
   
 ## Todo ✔️
 - [x] Option to change data file location

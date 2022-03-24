@@ -33,7 +33,7 @@ namespace LeaguePassManager
                     {
                         selectedAccount = (LolAccount)(window as MainWindow).datagrid1.SelectedItem;
                     }
-                    catch (Exception exce)
+                    catch (Exception)
                     {
                         MessageBox.Show("You need to select an account first!");
                         (window as MainWindow).Show();
@@ -90,7 +90,7 @@ namespace LeaguePassManager
                     {
                         try
                         {
-                            mainWindow.FindAt(TreeScope.Descendants, 3, cf.ByControlType(ControlType.Button)).AsButton().Invoke();
+                            mainWindow.FindAt(TreeScope.Descendants, 5, cf.ByControlType(ControlType.Button)).AsButton().Invoke();
                             tryAgain = false;
                         }
                         catch (Exception e) { }

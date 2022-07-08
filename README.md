@@ -40,7 +40,7 @@ In some cases, the app won't launch unless started as an administrator.
 - [ ] Account export in formatted text
 - [ ] Option to copy all data to clipboard
 - [ ] Option to copy single account data to clipboard
-- [ ] Optional cloud sync
+- [❗] ~~Optional cloud sync~~ - bad idea (security & privacy concerns), workaround: store passwords.txt file in a cloud storage such as GDrive, DropBox, NextCloud, etc..
 
 
 #### Disclaimer 📢📢

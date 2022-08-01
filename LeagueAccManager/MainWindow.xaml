@@ -52,12 +52,12 @@
                         <Image Source="assets/minimize.png" Opacity="1" />
                     </Button>
                     <Label Background="{x:Null}" HorizontalAlignment="Left" Margin="1,0,0,0" Content="League Account Manager" BorderBrush="{x:Null}" FontFamily="Yu Gothic UI" Foreground="#36FFFFFF" />
-                
+
                 </DockPanel>
                 <Grid  Margin="0,34,0,0">
                     <hc:LoadingCircle x:Name="loadingIndicator" Margin="0,6,10,0" Visibility="Hidden" HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="30"/>
                     <TabControl x:Name="tabControl"   Style="{StaticResource TabControlCapsuleSolid}" Margin="0,6,0,0" Background="{x:Null}" VerticalContentAlignment="Center" UseLayoutRounding="False" SelectedIndex="0">
-                        
+
                         <TabItem Height="20" Header="LoL Accounts" Padding="16,0" >
                             <Grid >
 
@@ -79,11 +79,11 @@
                                                                 <VisualBrush Visual="{Binding ElementName=ImageMask}" />
                                                             </Image.OpacityMask>
                                                         </Image>
-                                                  
+
                                                         <Image Source="{Binding Path=divPath}" Width="42" Height="42" Margin="10,0,0,0" Stretch="Uniform"/>
-                                                        
+
                                                         <Label Content="{Binding Path=divString}" FontWeight="SemiBold" FontSize="11" Margin="6,0,0,0" Background="Transparent" BorderThickness="0"/>
-                                                        
+
                                                     </hc:FlexPanel>
 
                                                 </DataTemplate>
@@ -94,7 +94,7 @@
 
                                         <DataGridComboBoxColumn ItemsSource="{Binding Source={StaticResource Regions}}" Width="110" CanUserResize="True"  SelectedValueBinding="{Binding Path=Region}" Header="Region"/>
 
-                                        
+
 
                                         <DataGridTextColumn Header="Summoner Name"
                                      x:Name="columnSummonerName" 
@@ -119,12 +119,16 @@
                                      IsReadOnly="False">
                                         </DataGridTextColumn>
 
-                                      
+
 
                                     </DataGrid.Columns>
                                 </DataGrid>
-                                <Button x:Name="fillButton" Style="{StaticResource ButtonPrimary}" Margin="8,0,139,4" Content="Fill" VerticalAlignment="Bottom" Click="fillButton_Click" HorizontalAlignment="Stretch" Width="auto" Padding="10,6,10,6" HorizontalContentAlignment="Center"/>
-                                <Button x:Name="removeButton" Style="{StaticResource ButtonPrimary}" Margin="0,0,4,4" Content="Remove" VerticalAlignment="Bottom" Height="30" Click="removeButton_Click" HorizontalAlignment="Right" Width="130" Visibility="Visible"/>
+                                <StackPanel Margin="0,0,0,4" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Button x:Name="fillButton" Style="{StaticResource ButtonPrimary}" Content="Fill" Click="fillButton_Click" Padding="10,6,10,6" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="300"/>
+                                    <Label Content="Reveal all passwords" BorderBrush="{x:Null}" Margin="8,0,0,0" />
+                                    <ToggleButton x:Name="revealPasswordsSwitch" Style="{StaticResource ToggleButtonSwitch}" Width="20" Margin="0,0,6,0" />
+                                    <Button x:Name="removeButton" Style="{StaticResource ButtonPrimary}" Content="Remove" Click="removeButton_Click" HorizontalAlignment="Right" Visibility="Visible" VerticalAlignment="Bottom" Margin="10,0,0,0"/>
+                                </StackPanel>
 
                             </Grid>
                         </TabItem>
@@ -133,7 +137,7 @@
 
                                 <DataGrid x:Name="dataGridValorant"  Margin="0,0,0,38" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Visible"  AutoGenerateColumns="False" ItemsSource="{Binding Path=valorantAccounts, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" GridLinesVisibility="None" VerticalGridLinesBrush="#29000000"  HeadersVisibility="Column" CanUserAddRows="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" CanUserReorderColumns="True" CellEditEnding="dataGridValorant_CellEditEnding" RowEditEnding="dataGridValorant_RowEditEnding" CurrentCellChanged="dataGridValorant_CurrentCellChanged" >
                                     <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Player Name"
+                                        <DataGridTextColumn Header="Player Name"
                                      x:Name="columnValorantPlayerName" 
                                                    
                                      Binding="{Binding Path=PlayerName}"
@@ -228,7 +232,7 @@
 
                             </hc:FlexPanel>
                         </TabItem>
-                        
+
 
                     </TabControl>
                     <Grid Visibility="Hidden" x:Name="passwordPromptGrid" FocusManager.FocusedElement="{Binding ElementName=encryptionKey}">
@@ -246,5 +250,6 @@
 
         </Border>
         <hc:FlexPanel/>
+        <hc:SimplePanel/>
     </Grid>
 </Window>

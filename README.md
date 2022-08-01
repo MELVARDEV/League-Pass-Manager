@@ -1,5 +1,6 @@
 # League-Pass-Manager 🔑
 siema to ja dzang
+xddddd
 A tool that makes it easier to manage your League of Legends and Valorant passwords, made for people who use infamous password storage method -> "accounts.txt" on the desktop.
 
 ![Screenshot](https://user-images.githubusercontent.com/36396619/125109347-86481100-e0e3-11eb-9102-4ea4c95be81c.png)

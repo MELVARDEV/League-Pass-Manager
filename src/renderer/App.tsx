@@ -1,50 +1,62 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import icon from '../../assets/icon.svg';
+import { NextUIProvider } from '@nextui-org/react';
 import './App.css';
+import Sidebar from './components/Sidebar';
+import { ThemeProvider as NextThemesProvider } from 'next-themes';
+import Accounts from './components/pages/Accounts';
+import Settings from './components/pages/Settings';
+import { createTheme } from "@nextui-org/react"
+import { useEffect } from 'react';
 
-const Hello = () => {
-  return (
-    <div>
-      <div className="Hello">
-        <img width="200" alt="icon" src={icon} />
-      </div>
-      <h1>electron-react-boilerplate</h1>
-      <div className="Hello">
-        <a
-          href="https://electron-react-boilerplate.js.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              📚
-            </span>
-            Read our docs
-          </button>
-        </a>
-        <a
-          href="https://github.com/sponsors/electron-react-boilerplate"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              🙏
-            </span>
-            Donate
-          </button>
-        </a>
-      </div>
-    </div>
-  );
-};
+const lightTheme = createTheme({
+  type: 'light',
+  theme: {
+  }
+})
+
+const darkTheme = createTheme({
+  type: 'dark',
+  theme: {
+  }
+});
 
 export default function App() {
+
+  useEffect(() => {
+    window.electron.ipcRenderer.once('ipc-example', (arg) => {
+      // eslint-disable-next-line no-console
+      console.log("test" + arg);
+    });
+    window.electron.ipcRenderer.sendMessage('ipc-example', ['ping']);
+    
+  }, [])
+  
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Hello />} />
-      </Routes>
-    </Router>
+    <NextThemesProvider defaultTheme="system"
+    attribute="class"
+    value={{
+      light: lightTheme.className,
+      dark: darkTheme.className
+    }}>
+      <NextUIProvider>
+        <div style={{ width: '100%', display: 'flex' }}>
+
+          <Router>
+            <Sidebar />
+            <div id="content">
+              <Routes>
+                <Route path="/" element={<Accounts />} />
+                <Route path="/settings" element={<Settings />} />
+              </Routes>
+            </div>
+          </Router>
+
+        </div>
+
+      </NextUIProvider>
+    </NextThemesProvider>
+
+
   );
 }

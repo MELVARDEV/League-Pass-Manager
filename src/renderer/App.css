@@ -7,9 +7,11 @@ body {
   color: white;
   height: 100vh;
   width: 100vw;
-  background-image: linear-gradient(to top, #00060e 0%, #0c0918 100%),;
+  background-image: linear-gradient(to top, #000408 0%, #090611 100%),;
   font-family: sans-serif;
   display: flex;
+  user-select: none;
+  --border: 1px solid rgba(196, 194, 194, 0.075);
 }
 
 #root {
@@ -22,15 +24,24 @@ body {
 #sideBar{
   display: inline-block;
   background-color: #1a1a1a3a;
-  border-right: 1px solid rgba(196, 194, 194, 0.075);
+  border-right: var(--border);
   height:100vh;
   width:14rem;
   padding: 14px;
 }
 
+#acc-layout-child-footer{
+  display: inline-block;
+  background-color: #1a1a1a3a;
+  border-right: 1px solid rgba(196, 194, 194, 0.075);
+  height:4rem;
+  border-top: var(--border);
+  width:100%;
+  padding: 14px;
+}
+
 #content{
   display: inline-block;
-  padding: 1rem;
   width: 100%;
 }
 

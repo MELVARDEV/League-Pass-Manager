@@ -1,6 +1,8 @@
 ### Announcement 📢
 Recently I've decided to re-write the app from the ground up. The new version will be using a different tech stack with the aim of making the app multi-platform, working on Windows, Mac, and GNU/Linux. Ultimately, the new app will either be compatible with the old account data format or allow seamless migration. All existing features will be present and new or requested features will be addressed in the new version. The current version of the app will only be updated when/if there is any major change in the Riot Games API or client that would break the functionality of the app.
 
+If you're interested about the current state of the project, any updates will be present in the README section [here.](https://github.com/MELVARDEV/League-Pass-Manager/tree/rewrite)
+
 # League-Pass-Manager 🔑
 A tool that makes it easier to manage your League of Legends and Valorant passwords, made for people who use infamous password storage method -> "accounts.txt" on the desktop.
 

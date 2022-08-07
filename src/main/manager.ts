@@ -39,3 +39,27 @@ ipcMain.on('init-app', async (event, arg) => {
     settings: settings,
   });
 });
+
+ipcMain.on('create-account-file', async (event, arg: any) => {
+  const accountsPath: string = path.join(applicationDataPath, 'accounts.data');
+  console.log(arg.password);
+  if (!fs.existsSync(accountsPath)) {
+    const fileString = JSON.stringify([]);
+    const cipher = crypto.createCipher('aes-256-cbc', arg.password);
+
+    const encryptedFileString =
+      cipher.update(fileString, 'utf8', 'hex') + cipher.final('hex');
+
+    fs.writeFileSync(accountsPath, encryptedFileString);
+
+    event.reply('create-account-file', {
+      accountFileExists: checkIfAccountFileExist(),
+      accountData: [],
+      error: false,
+    });
+  } else {
+    event.reply('create-account-file', {
+      error: 'Account file already exists.',
+    });
+  }
+});

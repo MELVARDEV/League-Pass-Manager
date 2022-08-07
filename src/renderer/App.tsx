@@ -22,7 +22,9 @@ const darkTheme = createTheme({
 
 export default function App() {
   const [accountFileExists, setAccountFileExists] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [accounts, setAccounts] = useState([]);
 
   useEffect(() => {
     window.electron.ipcRenderer.sendMessage('init-app', [{}]);
@@ -48,7 +50,7 @@ export default function App() {
           </div>
         ) : (
           <div style={{ width: '100%', display: 'flex' }}>
-            {accountFileExists ? (
+            {accountFileExists && authenticated ? (
               <Router>
                 <Sidebar />
                 <div id="content">
@@ -60,7 +62,9 @@ export default function App() {
               </Router>
             ) : (
               <Login
+                setAuthenticated={setAuthenticated}
                 setAccountFileExists={setAccountFileExists}
+                setAccounts={setAccounts}
                 accountFileExists={accountFileExists}
               />
             )}

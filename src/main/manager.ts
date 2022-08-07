@@ -42,7 +42,6 @@ ipcMain.on('init-app', async (event, arg) => {
 
 ipcMain.on('create-account-file', async (event, arg: any) => {
   const accountsPath: string = path.join(applicationDataPath, 'accounts.data');
-  console.log(arg.password);
   if (!fs.existsSync(accountsPath)) {
     const fileString = JSON.stringify([]);
     const cipher = crypto.createCipher('aes-256-cbc', arg.password);
@@ -60,6 +59,36 @@ ipcMain.on('create-account-file', async (event, arg: any) => {
   } else {
     event.reply('create-account-file', {
       error: 'Account file already exists.',
+    });
+  }
+});
+
+ipcMain.on('authenticate', async (event, arg: any) => {
+  try {
+    const accountsPath: string = path.join(
+      applicationDataPath,
+      'accounts.data'
+    );
+    const accountsData: string = fs.readFileSync(accountsPath, 'utf8');
+    const decipher = crypto.createDecipher('aes-256-cbc', arg.password);
+
+    const decryptedAccountsData =
+      decipher.update(accountsData, 'hex', 'utf8') + decipher.final('utf8');
+    const accounts: LolAccounts = JSON.parse(decryptedAccountsData);
+
+    if (accounts) {
+      event.reply('authenticate', {
+        authenticated: true,
+        accounts: accounts,
+      });
+    } else {
+      event.reply('authenticate', {
+        authenticated: false,
+      });
+    }
+  } catch (error) {
+    event.reply('authenticate', {
+      authenticated: false,
     });
   }
 });

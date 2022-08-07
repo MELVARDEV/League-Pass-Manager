@@ -77,7 +77,7 @@ body {
   flex-direction: column;
   margin:auto;
   width: 500px;
-  border-radius: 5px;
+  border-radius: 12px;
   padding: 25px;
   border: 1px solid rgb(40, 39, 44);
 }

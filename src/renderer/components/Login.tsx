@@ -4,6 +4,8 @@ import { useState } from 'react';
 type Props = {
   accountFileExists: boolean;
   setAccountFileExists: (accountFileExists: boolean) => void;
+  setAccounts: (accounts: any) => void;
+  setAuthenticated: (authenticated: boolean) => void;
 };
 
 export const Login = (props: Props) => {
@@ -38,8 +40,9 @@ export const Login = (props: Props) => {
       password: password,
     });
     window.electron.ipcRenderer.once('authenticate', (arg: any) => {
-      if (arg.error === false) {
+      if (arg.authenticated === true) {
         props.setAccountFileExists(true);
+        props.setAuthenticated(true);
       } else {
         setMessage('Incorrect password');
       }

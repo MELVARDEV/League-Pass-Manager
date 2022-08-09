@@ -1,10 +1,12 @@
 type LolAccount = {
-  username: string;
-  password: string;
-  region: string;
-  summonerName: string;
-  summonerLevel: number;
-  profileIconId: number;
+  id: string;
+  username?: string;
+  password?: string;
+  region?: string;
+  summonerName?: string;
+  description?: string;
+  summonerLevel?: number;
+  profileIconId?: number;
 };
 
 type LolAccounts = LolAccount[];

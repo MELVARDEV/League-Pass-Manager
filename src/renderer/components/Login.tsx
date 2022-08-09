@@ -41,6 +41,7 @@ export const Login = (props: Props) => {
     });
     window.electron.ipcRenderer.once('authenticate', (arg: any) => {
       if (arg.authenticated === true) {
+        props.setAccounts(arg.accounts);
         props.setAccountFileExists(true);
         props.setAuthenticated(true);
       } else {

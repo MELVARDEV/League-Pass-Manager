@@ -55,7 +55,15 @@ export default function App() {
                 <Sidebar />
                 <div id="content">
                   <Routes>
-                    <Route path="/" element={<Accounts />} />
+                    <Route
+                      path="/"
+                      element={
+                        <Accounts
+                          setAccounts={setAccounts}
+                          accounts={accounts}
+                        />
+                      }
+                    />
                     <Route path="/settings" element={<Settings />} />
                   </Routes>
                 </div>

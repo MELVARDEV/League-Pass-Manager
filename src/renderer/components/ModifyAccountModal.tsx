@@ -10,15 +10,32 @@ import {
 } from '@nextui-org/react';
 import { AiOutlineUserAdd } from 'react-icons/ai';
 
-export default function AddAccountModal({ onSubmit }: any) {
-  const [selected, setSelected] = useState('EUW');
+type Props = {
+  onSubmit: any;
+  account: LolAccount;
+  isOpen: boolean;
+  setIsOpen: any;
+};
+
+export default function ModifyAccountModal({
+  onSubmit,
+  account,
+  isOpen,
+  setIsOpen,
+}: Props) {
+  const [selected, setSelected] = useState('EUW') as any;
   const [accountData, setAccountData] = useState({
     username: '',
     summonerName: '',
     password: '',
     region: '',
     description: '',
-  });
+  }) as any;
+
+  useEffect(() => {
+    setAccountData(account);
+    setSelected(account.region);
+  }, [account]);
 
   useEffect(() => {
     setAccountData({
@@ -34,13 +51,10 @@ export default function AddAccountModal({ onSubmit }: any) {
     });
   };
 
-  const selectedValue = useMemo(() => Array.from(selected), [selected]);
-
-  const [visible, setVisible] = useState(false);
-  const handler = () => setVisible(true);
+  const selectedValue = useMemo(() => Array.from(selected), [selected]) as any;
 
   const closeHandler = () => {
-    setVisible(false);
+    setIsOpen(false);
     console.log('closed');
   };
 
@@ -61,16 +75,10 @@ export default function AddAccountModal({ onSubmit }: any) {
 
   return (
     <div>
-      <Button
-        auto
-        color="secondary"
-        onClick={handler}
-        icon={<AiOutlineUserAdd />}
-      />
-      <Modal open={visible} onClose={closeHandler}>
+      <Modal open={isOpen} onClose={closeHandler}>
         <Modal.Header>
           <Text b size={20}>
-            Add Account
+            Modify account
           </Text>
         </Modal.Header>
         <Modal.Body>

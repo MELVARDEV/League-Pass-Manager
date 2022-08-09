@@ -1,6 +1,12 @@
-import { Table, Button, Avatar } from '@nextui-org/react';
+import { Table, Button, Avatar, Spacer } from '@nextui-org/react';
+import AddAccountModal from '../AddAccountModal';
 
 export default function Accounts() {
+  const addAccount = (accountData: any) => {
+    console.log('adding account');
+    console.log(accountData);
+  };
+
   return (
     <div>
       <div
@@ -54,6 +60,8 @@ export default function Accounts() {
           style={{ alignItems: 'center', display: 'inline-flex' }}
         >
           <Button>Fill</Button>
+          <Spacer y={0.5} />
+          <AddAccountModal onSubmit={addAccount} />
         </div>
       </div>
     </div>

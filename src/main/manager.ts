@@ -1,24 +1,25 @@
-import { app, BrowserWindow, shell, ipcMain, ipcRenderer, App } from 'electron';
+import { app, ipcMain } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import '../types/managerTypes';
 
+// TODO: add auto app close when inactive
 const defaultSettings: AppSettings = {
   clientPath: '',
   autoOpenClient: false,
   autoCloseOnFill: false,
 };
 
-var settings: AppSettings;
+let settings: AppSettings;
+let encryptionKey: string;
+let applicationDataPath: string;
 
-var applicationDataPath: string;
-
-let checkIfAccountFileExist = (): boolean => {
+const checkIfAccountFileExist = (): boolean => {
   return fs.existsSync(path.join(applicationDataPath, 'accounts.data'));
 };
 
-ipcMain.on('init-app', async (event, arg) => {
+ipcMain.on('init-app', async (event) => {
   // Create user data directory if it doesn't exist
   const documentsPath: string = app.getPath('documents');
   applicationDataPath = path.join(documentsPath, 'LeaguePassManager');
@@ -36,7 +37,7 @@ ipcMain.on('init-app', async (event, arg) => {
 
   event.reply('init-app', {
     accountFileExists: checkIfAccountFileExist(),
-    settings: settings,
+    settings,
   });
 });
 
@@ -56,6 +57,8 @@ ipcMain.on('create-account-file', async (event, arg: any) => {
       accountData: [],
       error: false,
     });
+
+    encryptionKey = arg.password;
   } else {
     event.reply('create-account-file', {
       error: 'Account file already exists.',
@@ -77,9 +80,10 @@ ipcMain.on('authenticate', async (event, arg: any) => {
     const accounts: LolAccounts = JSON.parse(decryptedAccountsData);
 
     if (accounts) {
+      encryptionKey = arg.password;
       event.reply('authenticate', {
         authenticated: true,
-        accounts: accounts,
+        accounts,
       });
     } else {
       event.reply('authenticate', {

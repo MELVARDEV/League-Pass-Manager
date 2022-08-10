@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto, { randomUUID } from 'crypto';
 import '../types/managerTypes';
+import { fetchAccount } from '../api_functions/api';
 
 // TODO: add auto app close when inactive
 const defaultSettings: AppSettings = {
@@ -77,8 +78,8 @@ ipcMain.on('add-account', async (event, account: LolAccount) => {
   const accounts: LolAccounts = JSON.parse(decryptedAccounts);
 
   // Add account to accounts array
-
-  accounts.push({ ...account, id: randomUUID() });
+  const updatedAccount = await fetchAccount(account);
+  accounts.push({ ...updatedAccount, id: randomUUID() });
 
   // Update accounts file and encrypt it
   const cipher = crypto.createCipher('aes-256-cbc', encryptionKey);
@@ -129,7 +130,8 @@ ipcMain.on('edit-account', async (event, arg: any) => {
 
   // Find account in array and modify it
   const accountIndex = accounts.findIndex((account) => account.id === arg.id);
-  accounts[accountIndex] = { ...arg };
+  console.log(await fetchAccount(arg));
+  accounts[accountIndex] = { ...(await fetchAccount(arg)) };
   // Update accounts file and encrypt it
   const cipher = crypto.createCipher('aes-256-cbc', encryptionKey);
   const encryptedAccounts =

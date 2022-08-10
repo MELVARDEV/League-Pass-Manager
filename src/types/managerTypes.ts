@@ -1,5 +1,5 @@
 type LolAccount = {
-  id: string;
+  id?: string;
   username?: string;
   password?: string;
   region?: string;
@@ -7,6 +7,11 @@ type LolAccount = {
   description?: string;
   summonerLevel?: number;
   profileIconId?: number;
+  tier?: string;
+  rank?: string;
+  leaguePoints?: number;
+  wins?: number;
+  losses?: number;
 };
 
 type LolAccounts = LolAccount[];

@@ -5,6 +5,7 @@ import { Table, Button, Avatar, Spacer, Text } from '@nextui-org/react';
 import { MdDeleteForever, MdModeEdit } from 'react-icons/md';
 import AddAccountModal from '../AddAccountModal';
 import ModifyAccountModal from '../ModifyAccountModal';
+import { fetchAccount } from '../../../api_functions/api';
 
 type Props = {
   accounts: LolAccount[];
@@ -79,7 +80,6 @@ export default function Accounts({ accounts, setAccounts }: Props) {
         }}
       >
         <div id="acc-layout-child-table" style={{ width: '100%' }}>
-          <Text>{selectedAccount && selectedAccount.summonerName}</Text>
           <Table
             aria-label="Accounts"
             selectedKeys={selectedAccounts}
@@ -106,11 +106,20 @@ export default function Accounts({ accounts, setAccounts }: Props) {
                   <Table.Cell>
                     <Avatar
                       squared
-                      src="https://ddragon.leagueoflegends.com/cdn/12.14.1/img/profileicon/590.png"
+                      bordered
+                      src={`https://ddragon.leagueoflegends.com/cdn/12.14.1/img/profileicon/${
+                        account.profileIconId ? account.profileIconId : 29
+                      }.png`}
                     />
                   </Table.Cell>
-                  <Table.Cell>Unranked</Table.Cell>
-                  <Table.Cell>?</Table.Cell>
+                  <Table.Cell>
+                    {account.tier
+                      ? `${account.tier} ${account.rank} ${account.leaguePoints} LP`
+                      : ''}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {account.summonerLevel ? account.summonerLevel : ''}
+                  </Table.Cell>
                   <Table.Cell>{account.region}</Table.Cell>
                   <Table.Cell>{account.summonerName}</Table.Cell>
                   <Table.Cell>{account.username}</Table.Cell>

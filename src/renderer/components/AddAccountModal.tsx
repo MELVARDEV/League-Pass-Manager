@@ -10,7 +10,11 @@ import {
 } from '@nextui-org/react';
 import { AiOutlineUserAdd } from 'react-icons/ai';
 
-export default function AddAccountModal({ onSubmit }: any) {
+type Props = {
+  onSubmit: (account: LolAccount) => void;
+};
+
+export default function AddAccountModal({ onSubmit }: Props) {
   const [selected, setSelected] = useState('EUW');
   const [accountData, setAccountData] = useState({
     username: '',
@@ -18,14 +22,7 @@ export default function AddAccountModal({ onSubmit }: any) {
     password: '',
     region: '',
     description: '',
-  });
-
-  useEffect(() => {
-    setAccountData({
-      ...accountData,
-      region: selectedValue[0],
-    });
-  }, [selected]);
+  } as LolAccount);
 
   const handlechange = (e: any) => {
     setAccountData({
@@ -34,7 +31,17 @@ export default function AddAccountModal({ onSubmit }: any) {
     });
   };
 
-  const selectedValue = useMemo(() => Array.from(selected), [selected]);
+  const selectedValue = useMemo(
+    () => Array.from(selected).join(''),
+    [selected]
+  );
+
+  useEffect(() => {
+    setAccountData({
+      ...accountData,
+      region: selectedValue,
+    });
+  }, [selected]);
 
   const [visible, setVisible] = useState(false);
   const handler = () => setVisible(true);

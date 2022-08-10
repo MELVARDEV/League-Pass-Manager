@@ -1,12 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import { NextUIProvider } from '@nextui-org/react';
+import { NextUIProvider, createTheme, Loading } from '@nextui-org/react';
 import './App.css';
-import Sidebar from './components/Sidebar';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
+import { useEffect, useState } from 'react';
+import Sidebar from './components/Sidebar';
 import Accounts from './components/pages/Accounts';
 import Settings from './components/pages/Settings';
-import { createTheme, Loading } from '@nextui-org/react';
-import { useEffect, useState } from 'react';
 import { Login } from './components/Login';
 import '../types/managerTypes';
 
@@ -59,7 +59,7 @@ export default function App() {
                       path="/"
                       element={
                         <Accounts
-                          setAccounts={setAccounts}
+                          setAccounts={setAccounts as any}
                           accounts={accounts}
                         />
                       }
@@ -72,7 +72,7 @@ export default function App() {
               <Login
                 setAuthenticated={setAuthenticated}
                 setAccountFileExists={setAccountFileExists}
-                setAccounts={setAccounts}
+                setAccounts={setAccounts as any}
                 accountFileExists={accountFileExists}
               />
             )}

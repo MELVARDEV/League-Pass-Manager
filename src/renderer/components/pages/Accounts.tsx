@@ -1,31 +1,28 @@
-import { Table, Button, Avatar, Spacer, Text } from '@nextui-org/react';
-import AddAccountModal from '../AddAccountModal';
-import { MdModeEdit } from 'react-icons/md';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react';
+import { Table, Button, Avatar, Spacer, Text } from '@nextui-org/react';
+import { MdDeleteForever, MdModeEdit } from 'react-icons/md';
+import AddAccountModal from '../AddAccountModal';
 import ModifyAccountModal from '../ModifyAccountModal';
 
 type Props = {
   accounts: LolAccount[];
-  setAccounts: any;
+  setAccounts: (accounts: LolAccount[]) => void;
 };
 
 // Get account by id
 const getAccountById = (accounts: LolAccount[], id: string) => {
-  return accounts.find((account: LolAccount) => account.id == id);
+  return accounts.find((account: LolAccount) => account.id === id);
 };
 
 export default function Accounts({ accounts, setAccounts }: Props) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedAccounts, setSelectedAccounts] = useState([
-    accounts[0].id,
-  ]) as any;
+  const [selectedAccounts, setSelectedAccounts] = useState() as any;
   const [selectedAccount, setSelectedAccount] = useState() as any;
   const addAccount = (accountData: LolAccount) => {
     window.electron.ipcRenderer.sendMessage('add-account', accountData);
-    window.electron.ipcRenderer.once('create-account-file', (arg: any) => {
-      if (arg.error === false) {
-      }
-    });
+    window.electron.ipcRenderer.once('create-account-file', () => {});
 
     window.electron.ipcRenderer.sendMessage('get-accounts', {});
     window.electron.ipcRenderer.once('get-accounts', (arg: any) => {
@@ -35,16 +32,38 @@ export default function Accounts({ accounts, setAccounts }: Props) {
     });
   };
 
-  const editAccount = (id: string) => {
-    const account = getAccountById(accounts, id);
-    if (account) {
+  const editAccount = (account: LolAccount) => {
+    window.electron.ipcRenderer.sendMessage('edit-account', account);
+    window.electron.ipcRenderer.once('edit-account', (arg: any) => {
+      if (arg.error === false) {
+        setAccounts(arg.accounts);
+      }
+    });
+  };
+
+  // remove an account
+  const removeAccount = () => {
+    if (!selectedAccount) {
+      return;
     }
+    const account = selectedAccount;
+    window.electron.ipcRenderer.sendMessage('remove-account', account.id);
+    window.electron.ipcRenderer.once('remove-account', (arg: any) => {
+      if (arg.error === false) {
+        setAccounts(arg.accounts);
+      }
+    });
   };
 
   useEffect(() => {
-    let account = getAccountById(accounts, selectedAccounts.currentKey);
-    if (account) {
-      setSelectedAccount(account);
+    // check if selectedAccounts has 'currentKey' property
+    if (selectedAccounts && selectedAccounts.currentKey) {
+      const account = getAccountById(accounts, selectedAccounts.currentKey);
+      if (account) {
+        setSelectedAccount(account);
+      } else {
+        setSelectedAccount(accounts[0]);
+      }
     }
   }, [selectedAccounts]);
 
@@ -71,7 +90,6 @@ export default function Accounts({ accounts, setAccounts }: Props) {
               height: 'auto',
               minWidth: '100%',
             }}
-            disallowEmptySelection
             selectionMode="single"
           >
             <Table.Header>
@@ -81,13 +99,11 @@ export default function Accounts({ accounts, setAccounts }: Props) {
               <Table.Column>Region</Table.Column>
               <Table.Column>Summoner Name</Table.Column>
               <Table.Column>Username</Table.Column>
-              <Table.Column> </Table.Column>
             </Table.Header>
             <Table.Body>
               {accounts.map((account: LolAccount) => (
                 <Table.Row key={account.id}>
                   <Table.Cell>
-                    {' '}
                     <Avatar
                       squared
                       src="https://ddragon.leagueoflegends.com/cdn/12.14.1/img/profileicon/590.png"
@@ -98,22 +114,13 @@ export default function Accounts({ accounts, setAccounts }: Props) {
                   <Table.Cell>{account.region}</Table.Cell>
                   <Table.Cell>{account.summonerName}</Table.Cell>
                   <Table.Cell>{account.username}</Table.Cell>
-                  <Table.Cell>
-                    <Button
-                      light
-                      color="primary"
-                      onPress={() => setIsEditModalOpen(true)}
-                      icon={<MdModeEdit />}
-                      auto
-                    ></Button>
-                  </Table.Cell>
                 </Table.Row>
               ))}
             </Table.Body>
           </Table>
 
           <ModifyAccountModal
-            onSubmit={undefined}
+            onSubmit={editAccount}
             account={selectedAccount}
             isOpen={isEditModalOpen}
             setIsOpen={setIsEditModalOpen}
@@ -121,11 +128,39 @@ export default function Accounts({ accounts, setAccounts }: Props) {
         </div>
         <div
           id="acc-layout-child-footer"
-          style={{ alignItems: 'center', display: 'inline-flex' }}
+          style={{
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            display: 'inline-flex',
+          }}
         >
           <Button>Fill</Button>
-          <Spacer y={0.5} />
-          <AddAccountModal onSubmit={addAccount} />
+          <Spacer x={1} />
+          <div
+            style={{
+              display: 'inline-flex',
+            }}
+          >
+            <AddAccountModal onSubmit={addAccount} />
+            <Spacer x={0.4} />
+            <Button
+              color="primary"
+              onPress={() => {
+                if (selectedAccount) {
+                  setIsEditModalOpen(true);
+                }
+              }}
+              icon={<MdModeEdit />}
+              auto
+            />
+            <Spacer x={0.4} />
+            <Button
+              color="error"
+              onPress={removeAccount}
+              icon={<MdDeleteForever />}
+              auto
+            />
+          </div>
         </div>
       </div>
     </div>

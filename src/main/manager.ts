@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { app, ipcMain } from 'electron';
 import fs from 'fs';
 import path from 'path';
@@ -38,6 +39,29 @@ ipcMain.on('init-app', async (event) => {
   event.reply('init-app', {
     accountFileExists: checkIfAccountFileExist(),
     settings,
+  });
+});
+
+// Decrypt accounts file into LolAccount array, remove an account, encrypt and save
+ipcMain.on('remove-account', (event, accountId: string) => {
+  const accountsPath: string = path.join(applicationDataPath, 'accounts.data');
+
+  // decrypt accounts file
+  const decipher = crypto.createDecipher('aes-256-cbc', encryptionKey);
+  const decryptedAccounts =
+    decipher.update(fs.readFileSync(accountsPath, 'utf8'), 'hex', 'utf8') +
+    decipher.final('utf8');
+  const accounts: LolAccounts = JSON.parse(decryptedAccounts);
+  const newAccounts: LolAccount[] = accounts.filter(
+    (account) => account.id !== accountId
+  );
+  const newAccountsEncrypted: string = crypto
+    .createCipher('aes-256-cbc', encryptionKey)
+    .update(JSON.stringify(newAccounts), 'utf8', 'hex');
+  fs.writeFileSync(accountsPath, newAccountsEncrypted);
+  event.reply('remove-account', {
+    accounts: newAccounts,
+    error: false,
   });
 });
 
@@ -93,6 +117,32 @@ ipcMain.on('create-account-file', async (event, arg: any) => {
   }
 });
 
+// Modify account in array by id
+ipcMain.on('edit-account', async (event, arg: any) => {
+  const accountsPath: string = path.join(applicationDataPath, 'accounts.data');
+  // Decrypt accounts file
+  const decipher = crypto.createDecipher('aes-256-cbc', encryptionKey);
+  const decryptedAccounts =
+    decipher.update(fs.readFileSync(accountsPath, 'utf8'), 'hex', 'utf8') +
+    decipher.final('utf8');
+  const accounts: LolAccounts = JSON.parse(decryptedAccounts);
+
+  // Find account in array and modify it
+  const accountIndex = accounts.findIndex((account) => account.id === arg.id);
+  accounts[accountIndex] = { ...arg };
+  // Update accounts file and encrypt it
+  const cipher = crypto.createCipher('aes-256-cbc', encryptionKey);
+  const encryptedAccounts =
+    cipher.update(JSON.stringify(accounts), 'utf8', 'hex') +
+    cipher.final('hex');
+  fs.writeFileSync(accountsPath, encryptedAccounts);
+  event.reply('edit-account', {
+    error: false,
+    accounts,
+    message: 'Account modified successfully',
+  });
+});
+
 const getAccounts = (): LolAccounts => {
   const accountsPath: string = path.join(applicationDataPath, 'accounts.data');
   const decipher = crypto.createDecipher('aes-256-cbc', encryptionKey);
@@ -107,34 +157,35 @@ ipcMain.on('get-accounts', async (event) => {
     error: false,
     accounts: getAccounts(),
   });
-}),
-  ipcMain.on('authenticate', async (event, arg: any) => {
-    try {
-      const accountsPath: string = path.join(
-        applicationDataPath,
-        'accounts.data'
-      );
-      const accountsData: string = fs.readFileSync(accountsPath, 'utf8');
-      const decipher = crypto.createDecipher('aes-256-cbc', arg.password);
+});
 
-      const decryptedAccountsData =
-        decipher.update(accountsData, 'hex', 'utf8') + decipher.final('utf8');
-      const accounts: LolAccounts = JSON.parse(decryptedAccountsData);
+ipcMain.on('authenticate', async (event, arg: any) => {
+  try {
+    const accountsPath: string = path.join(
+      applicationDataPath,
+      'accounts.data'
+    );
+    const accountsData: string = fs.readFileSync(accountsPath, 'utf8');
+    const decipher = crypto.createDecipher('aes-256-cbc', arg.password);
 
-      if (accounts) {
-        encryptionKey = arg.password;
-        event.reply('authenticate', {
-          authenticated: true,
-          accounts,
-        });
-      } else {
-        event.reply('authenticate', {
-          authenticated: false,
-        });
-      }
-    } catch (error) {
+    const decryptedAccountsData =
+      decipher.update(accountsData, 'hex', 'utf8') + decipher.final('utf8');
+    const accounts: LolAccounts = JSON.parse(decryptedAccountsData);
+
+    if (accounts) {
+      encryptionKey = arg.password;
+      event.reply('authenticate', {
+        authenticated: true,
+        accounts,
+      });
+    } else {
       event.reply('authenticate', {
         authenticated: false,
       });
     }
-  });
+  } catch (error) {
+    event.reply('authenticate', {
+      authenticated: false,
+    });
+  }
+});

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useMemo, useEffect } from 'react';
 import {
   Dropdown,
@@ -8,13 +10,12 @@ import {
   Textarea,
   Text,
 } from '@nextui-org/react';
-import { AiOutlineUserAdd } from 'react-icons/ai';
 
 type Props = {
-  onSubmit: any;
+  onSubmit: (account: LolAccount) => void;
   account: LolAccount;
   isOpen: boolean;
-  setIsOpen: any;
+  setIsOpen: (isOpen: boolean) => void;
 };
 
 export default function ModifyAccountModal({
@@ -24,25 +25,15 @@ export default function ModifyAccountModal({
   setIsOpen,
 }: Props) {
   const [selected, setSelected] = useState('EUW') as any;
+
   const [accountData, setAccountData] = useState({
+    id: '',
     username: '',
     summonerName: '',
     password: '',
     region: '',
     description: '',
-  }) as any;
-
-  useEffect(() => {
-    setAccountData(account);
-    setSelected(account.region);
-  }, [account]);
-
-  useEffect(() => {
-    setAccountData({
-      ...accountData,
-      region: selectedValue[0],
-    });
-  }, [selected]);
+  } as LolAccount);
 
   const handlechange = (e: any) => {
     setAccountData({
@@ -51,11 +42,27 @@ export default function ModifyAccountModal({
     });
   };
 
-  const selectedValue = useMemo(() => Array.from(selected), [selected]) as any;
+  const selectedValue = useMemo(
+    () => Array.from(selected).join(''),
+    [selected]
+  ) as any;
 
+  useEffect(() => {
+    // array of characters to string
+    setAccountData({
+      ...accountData,
+      region: selectedValue,
+    });
+  }, [selected]);
+
+  useEffect(() => {
+    if (account) {
+      setAccountData(account);
+      setSelected(account.region);
+    }
+  }, [account]);
   const closeHandler = () => {
     setIsOpen(false);
-    console.log('closed');
   };
 
   const regions = [
@@ -148,7 +155,7 @@ export default function ModifyAccountModal({
               flat
               color="success"
             >
-              Add
+              Save
             </Button>
           </Row>
         </Modal.Footer>

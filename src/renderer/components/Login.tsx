@@ -1,14 +1,21 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable import/prefer-default-export */
 import { Text, Input, Button, Spacer } from '@nextui-org/react';
 import { useState } from 'react';
 
 type Props = {
   accountFileExists: boolean;
   setAccountFileExists: (accountFileExists: boolean) => void;
-  setAccounts: (accounts: any) => void;
+  setAccounts: (accounts: LolAccount[]) => void;
   setAuthenticated: (authenticated: boolean) => void;
 };
 
-export const Login = (props: Props) => {
+export const Login = ({
+  setAccountFileExists,
+  setAccounts,
+  accountFileExists,
+  setAuthenticated,
+}: Props) => {
   const [password, setPassword] = useState('');
   const [repeatPassword, setRepeatPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -16,7 +23,6 @@ export const Login = (props: Props) => {
   const createAccountFile = () => {
     if (password !== repeatPassword) {
       setMessage('Passwords do not match');
-      console.log('Passwords do not match');
       return;
     }
 
@@ -26,24 +32,24 @@ export const Login = (props: Props) => {
     }
 
     window.electron.ipcRenderer.sendMessage('create-account-file', {
-      password: password,
+      password,
     });
     window.electron.ipcRenderer.once('create-account-file', (arg: any) => {
       if (arg.error === false) {
-        props.setAccountFileExists(true);
+        setAccountFileExists(true);
       }
     });
   };
 
   const authenticate = () => {
     window.electron.ipcRenderer.sendMessage('authenticate', {
-      password: password,
+      password,
     });
     window.electron.ipcRenderer.once('authenticate', (arg: any) => {
       if (arg.authenticated === true) {
-        props.setAccounts(arg.accounts);
-        props.setAccountFileExists(true);
-        props.setAuthenticated(true);
+        setAccounts(arg.accounts);
+        setAccountFileExists(true);
+        setAuthenticated(true);
       } else {
         setMessage('Incorrect password');
       }
@@ -55,7 +61,7 @@ export const Login = (props: Props) => {
       <div id="loginForm">
         <Text h2>Authentication</Text>
         <Spacer y={0.1} />
-        {!props.accountFileExists ? (
+        {!accountFileExists ? (
           <Text>Create your encrypted account database.</Text>
         ) : (
           <Text>Enter your password</Text>
@@ -67,8 +73,8 @@ export const Login = (props: Props) => {
           type="text"
           placeholder="Database encryption key"
         />
-        {!props.accountFileExists && <Spacer y={0.5} />}
-        {!props.accountFileExists && (
+        {!accountFileExists && <Spacer y={0.5} />}
+        {!accountFileExists && (
           <Input.Password
             value={repeatPassword}
             onChange={(e) => setRepeatPassword(e.target.value)}
@@ -83,10 +89,8 @@ export const Login = (props: Props) => {
         )}
         <Spacer y={0.8} />
 
-        <Button
-          onClick={props.accountFileExists ? authenticate : createAccountFile}
-        >
-          {props.accountFileExists ? 'Authenticate' : 'Create'}
+        <Button onClick={accountFileExists ? authenticate : createAccountFile}>
+          {accountFileExists ? 'Authenticate' : 'Create'}
         </Button>
       </div>
     </div>

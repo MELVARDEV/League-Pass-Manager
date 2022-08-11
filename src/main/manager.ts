@@ -79,7 +79,9 @@ ipcMain.on('add-account', async (event, account: LolAccount) => {
 
   // Add account to accounts array
   const updatedAccount = await fetchAccount(account);
-  accounts.push({ ...updatedAccount, id: randomUUID() });
+  // add id to updatedaccount
+  const accountWithId = { ...updatedAccount, id: randomUUID() };
+  accounts.push(accountWithId);
 
   // Update accounts file and encrypt it
   const cipher = crypto.createCipher('aes-256-cbc', encryptionKey);
@@ -89,6 +91,7 @@ ipcMain.on('add-account', async (event, account: LolAccount) => {
   fs.writeFileSync(accountsPath, encryptedAccounts);
   event.reply('add-account', {
     error: false,
+    account: accountWithId,
     message: 'Account added successfully',
   });
 });

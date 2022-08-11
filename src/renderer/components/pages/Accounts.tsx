@@ -23,13 +23,8 @@ export default function Accounts({ accounts, setAccounts }: Props) {
   const [selectedAccount, setSelectedAccount] = useState() as any;
   const addAccount = (accountData: LolAccount) => {
     window.electron.ipcRenderer.sendMessage('add-account', accountData);
-    window.electron.ipcRenderer.once('create-account-file', () => {});
-
-    window.electron.ipcRenderer.sendMessage('get-accounts', {});
-    window.electron.ipcRenderer.once('get-accounts', (arg: any) => {
-      if (arg.error === false) {
-        setAccounts(arg.accounts);
-      }
+    window.electron.ipcRenderer.once('add-account', (arg: any) => {
+      setAccounts([...accounts, arg.account]);
     });
   };
 

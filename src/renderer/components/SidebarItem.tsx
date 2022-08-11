@@ -1,23 +1,23 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
-    text: string,
-    icon?: any,
-    linkTo: string
+  text: string;
+  icon?: any;
+  linkTo: string;
 }
 
 export default function SidebarItem(props: SidebarProps) {
-    const navigate = useNavigate()
+  const navigate = useNavigate();
 
-    const switchPage = () => {
-        navigate(props.linkTo)
-    }
+  const switchPage = () => {
+    navigate(props.linkTo);
+  };
 
-    return (
-        <div onClick={switchPage} className={"sideBarItem"}>
-            {props.icon && <img src={props.icon}></img>}
-            <div style={{ marginLeft: 6 }}>{props.text}</div>
-        </div>
-    )
+  return (
+    <div onClick={switchPage} className={'sideBarItem'}>
+      {props.icon && <img src={props.icon}></img>}
+      <div style={{ marginLeft: 6 }}>{props.text}</div>
+    </div>
+  );
 }

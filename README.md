@@ -52,3 +52,14 @@ In some cases, the app won't launch unless started as an administrator.
 `` ⚠️You are encouraged to make backups of your account data as this is beta software and an event of data corruption might occur⚠️``
 
 ``This app isn’t endorsed by Riot Games and doesn’t reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends and Valorant. League of Legends™, Valorant and Riot Games are trademarks or registered trademarks of Riot Games, Inc.``
+
+<h1>[WIP] Account manager V2 rewrite</h1>
+This is the new version of the account manager that I'm working on. Currently I'm bringing up a workable skeleton for the app.
+
+<h2>What has been done so far:</h2>
+<ul>
+  <li>Basic UI layout
+  <li>Storing app settings
+  <li>Creating encrypted account database
+  <li>Authentication / Loading & decrypting account database
+</ul>

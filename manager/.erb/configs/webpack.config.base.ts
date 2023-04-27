@@ -11,7 +11,7 @@ const configuration: webpack.Configuration = {
   externals: [...Object.keys(externals || {})],
 
   stats: 'errors-only',
-
+  target: 'electron-main',
   module: {
     rules: [
       {

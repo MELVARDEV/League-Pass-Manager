@@ -9,11 +9,47 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import fs from 'fs';
+import Account from 'types/Accounts';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+
+// create appdata config directory
+const appDataPath = app.getPath('appData');
+
+if (!fs.existsSync(`${appDataPath}/R Account Manager`)) {
+  fs.mkdirSync(`${appDataPath}/R Account Manager`);
+}
+
+const getAccounts = () => {
+  const accounts: Account[] = JSON.parse(
+    fs.readFileSync(`${appDataPath}/R Account Manager/accounts.json`, 'utf8')
+  );
+
+  return accounts;
+};
+
+const saveAccounts = (accounts: Account[]) => {
+  fs.writeFileSync(
+    `${appDataPath}/R Account Manager/accounts.json`,
+    JSON.stringify(accounts)
+  );
+};
+
+ipcMain.handle('main', (event, ...args) => {
+  switch (args[0]) {
+    case 'get-accounts':
+      return getAccounts();
+    case 'save-accounts':
+      saveAccounts(args[1]);
+      break;
+    default:
+      break;
+  }
+});
 
 class AppUpdater {
   constructor() {
@@ -24,12 +60,6 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
-
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');

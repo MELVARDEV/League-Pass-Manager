@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { nanoid } from 'nanoid';
 import { useObserver } from 'mobx-react-lite';
 import { useAccountStore } from 'renderer/context/AccountContext';
 import { useEffect } from 'react';
@@ -7,7 +8,9 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import AddIcon from '@mui/icons-material/Add';
 import Avatar from '@mui/material/Avatar';
+import { Fab } from '@mui/material';
 // import electron remote fs
 
 import ListItemButton from '@mui/material/ListItemButton';
@@ -17,7 +20,7 @@ function AccountListElement({ account }: { account: Account }) {
     <ListItem disablePadding>
       <ListItemButton
         style={{
-          borderRadius: 4,
+          borderRadius: 6,
         }}
       >
         <ListItemIcon>
@@ -34,16 +37,6 @@ function AccountListElement({ account }: { account: Account }) {
 
 export default function Home() {
   const accountStore = useAccountStore();
-  useEffect(() => {
-    async function initAccounts() {
-      const accounts: Account[] = await window.electron.ipcRenderer.invoke(
-        'main',
-        'get-accounts'
-      );
-      accountStore.setAccounts(accounts);
-    }
-    initAccounts();
-  }, []);
 
   useEffect(() => {
     // async function initAccounts() {
@@ -61,15 +54,44 @@ export default function Home() {
     // initAccounts();
   }, []);
 
+  const addAccount = () => {
+    console.log('click add account');
+    accountStore.addAccount({
+      uid: nanoid(),
+      summonerName: 'tesddddddt',
+      region: 'NA',
+      profileIconId: 1045,
+      userName: 'test',
+      password: 'test',
+    });
+  };
+
   return useObserver(() => {
     return (
       <div className="page">
-        <div className="page-title">Accounts</div>
-        <List>
+        <List
+          style={{
+            height: 'fit-content',
+
+            paddingBottom: 40,
+          }}
+        >
           {accountStore.accounts.map((account: Account) => (
             <AccountListElement key={account.uid} account={account} />
           ))}
         </List>
+        <Fab
+          style={{
+            position: 'absolute',
+            bottom: 16,
+            right: 16,
+          }}
+          onClick={addAccount}
+          color="primary"
+          aria-label="add"
+        >
+          <AddIcon />
+        </Fab>
       </div>
     );
   });

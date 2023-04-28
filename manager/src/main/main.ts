@@ -39,15 +39,40 @@ const saveAccounts = (accounts: Account[]) => {
   );
 };
 
+const addAccount = (account: Account) => {
+  const accounts = getAccounts();
+  accounts.push(account);
+  saveAccounts(accounts);
+};
+
+const removeAccount = (uid: string) => {
+  const accounts = getAccounts();
+  const index = accounts.findIndex((account) => account.uid === uid);
+  accounts.splice(index, 1);
+  saveAccounts(accounts);
+};
+
+const updateAccount = (account: Account) => {
+  const accounts = getAccounts();
+  const index = accounts.findIndex((acc) => acc.uid === account.uid);
+  accounts[index] = account;
+  saveAccounts(accounts);
+};
+
 ipcMain.handle('main', (event, ...args) => {
   switch (args[0]) {
     case 'get-accounts':
       return getAccounts();
     case 'save-accounts':
-      saveAccounts(args[1]);
-      break;
+      return saveAccounts(args[1]);
+    case 'add-account':
+      return addAccount(args[1]);
+    case 'remove-account':
+      return removeAccount(args[1]);
+    case 'update-account':
+      return updateAccount(args[1]);
     default:
-      break;
+      return 0;
   }
 });
 
@@ -103,6 +128,8 @@ const createWindow = async () => {
     show: false,
     width: 1024,
     height: 728,
+    minHeight: 300,
+    minWidth: 500,
     transparent: true,
 
     frame: false,

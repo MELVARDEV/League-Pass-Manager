@@ -1,4 +1,3 @@
-import { nanoid } from 'nanoid';
 import AppConfig from 'types/Config';
 import Account from '../../types/Accounts';
 
@@ -15,17 +14,37 @@ export const createAccountStore = () => {
   return {
     accounts: [] as Account[],
     addAccount(account: Account) {
-      this.accounts.push({
-        ...account,
-        uid: nanoid(),
-      });
+      try {
+        window.electron.ipcRenderer.invoke('main', 'add-account', account);
+        this.accounts.push(account);
+      } catch (error) {
+        console.log(error);
+      }
     },
-    removeAccount(uid: string) {
-      this.accounts = this.accounts.filter((account) => account.uid !== uid);
+    async loadAccounts() {
+      const accounts: Account[] = await window.electron.ipcRenderer.invoke(
+        'main',
+        'get-accounts'
+      );
+      this.accounts = accounts;
     },
-    updateAccount(account: Account) {
-      const index = this.accounts.findIndex((acc) => acc.uid === account.uid);
-      this.accounts[index] = account;
+    async saveAccounts() {
+      await window.electron.ipcRenderer.invoke(
+        'main',
+        'save-accounts',
+        this.accounts
+      );
+    },
+    getAccounts() {
+      return this.accounts;
+    },
+    async removeAccount(uid: string) {
+      window.electron.ipcRenderer.invoke('main', 'remove-account', uid);
+      await this.loadAccounts();
+    },
+    async updateAccount(account: Account) {
+      window.electron.ipcRenderer.invoke('main', 'update-account', account);
+      await this.loadAccounts();
     },
 
     setAccounts(accounts: Account[]) {

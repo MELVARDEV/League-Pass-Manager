@@ -32,7 +32,7 @@ export default function AppDrawer() {
         {routes.map((route) => (
           <Button
             key={route.name}
-            variant={currentRoute === route.path ? 'contained' : 'text'}
+            variant="text"
             startIcon={route.icon}
             endIcon={
               currentRoute === route.path ? <ArrowRightRoundedIcon /> : null

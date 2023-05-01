@@ -111,6 +111,7 @@
     "mobx-react": "^7.6.0",
     "path-browserify": "^1.0.1",
     "polished": "^4.2.2",
+    "poro": "^2.1.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-loader-spinner": "^5.3.4",

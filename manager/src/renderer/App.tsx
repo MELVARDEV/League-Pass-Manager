@@ -4,6 +4,7 @@ import Account from 'types/Accounts';
 import { useAccountStore } from 'renderer/context/AccountContext';
 import { useEffect } from 'react';
 import Home from './pages/Home';
+
 import {} from '@mui/material';
 import AppDrawer from './components/drawer/Drawer';
 import TitleBar from './components/title_bar/TitleBar';
@@ -27,7 +28,7 @@ export default function App() {
     >
       <TitleBar />
       <div style={{ display: 'flex', flexGrow: 1, height: '100%' }}>
-        <AppDrawer />
+        {/* <AppDrawer /> */}
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />

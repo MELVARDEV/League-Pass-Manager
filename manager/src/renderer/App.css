@@ -36,7 +36,7 @@ body, :root, #root, html {
 }
 
 .listItemParent{
-  border-radius: 8px;
+  /* border-radius: 8px; */
 }
 
 .listItemChild {
@@ -48,6 +48,17 @@ body, :root, #root, html {
 
   /* transition: 0.05s ease-out; */
 }
+
+table td {
+  border:0 !important;
+}
+
+table th {
+  border-bottom:1px solid rgba(94, 94, 94, 0.185) !important;
+}
+
+
+
 
 .listItemParent:hover .listItemChild{
   opacity: 1 !important;

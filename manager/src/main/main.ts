@@ -17,11 +17,25 @@ import Account from 'types/Accounts';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
-// create appdata config directory
-const appDataPath = app.getPath('appData');
+// create documents folder
+const appDataPath = app.getPath('documents');
+
+// create R Account Manager folder if it doesn't exist
+const appDataPathExists = fs.existsSync(appDataPath);
+if (!appDataPathExists) {
+  fs.mkdirSync(appDataPath);
+}
 
 if (!fs.existsSync(`${appDataPath}/R Account Manager`)) {
   fs.mkdirSync(`${appDataPath}/R Account Manager`);
+}
+
+// create accounts.json if it doesn't exist
+if (!fs.existsSync(`${appDataPath}/R Account Manager/accounts.json`)) {
+  fs.writeFileSync(
+    `${appDataPath}/R Account Manager/accounts.json`,
+    JSON.stringify([])
+  );
 }
 
 const getAccounts = () => {

@@ -34,6 +34,24 @@ body, :root, #root, html {
   max-width: 240px;
 }
 
+.listItemParent{
+  border-radius: 8px;
+}
+
+.listItemChild {
+  opacity: 0 !important;
+}
+
+.listItemParent:hover{
+  background-color: rgba(195, 197, 202, 0.196);
+
+  /* transition: 0.05s ease-out; */
+}
+
+.listItemParent:hover .listItemChild{
+  opacity: 1 !important;
+}
+
 #titleBar{
   /* gradient left to right, transparent to dark */
   background: linear-gradient(30deg, rgba(0, 0, 0, 0) 0%, rgb(26, 26, 31) 100%);

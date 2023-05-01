@@ -10,30 +10,12 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import AddIcon from '@mui/icons-material/Add';
 import Avatar from '@mui/material/Avatar';
-import { Fab } from '@mui/material';
+import { Fab, Icon, IconButton } from '@mui/material';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import InputRoundedIcon from '@mui/icons-material/InputRounded';
 // import electron remote fs
 
 import ListItemButton from '@mui/material/ListItemButton';
-
-function AccountListElement({ account }: { account: Account }) {
-  return (
-    <ListItem disablePadding>
-      <ListItemButton
-        style={{
-          borderRadius: 6,
-        }}
-      >
-        <ListItemIcon>
-          <Avatar
-            alt={account.summonerName}
-            src={`https://ddragon.leagueoflegends.com/cdn/11.20.1/img/profileicon/${account.profileIconId}.png`}
-          />
-        </ListItemIcon>
-        <ListItemText primary={account.summonerName} />
-      </ListItemButton>
-    </ListItem>
-  );
-}
 
 export default function Home() {
   const accountStore = useAccountStore();
@@ -65,6 +47,37 @@ export default function Home() {
       password: 'test',
     });
   };
+
+  function AccountListElement({ account }: { account: Account }) {
+    return (
+      <ListItem className="listItemParent">
+        <ListItemIcon>
+          <Avatar
+            alt={account.summonerName}
+            src={`https://ddragon.leagueoflegends.com/cdn/11.20.1/img/profileicon/${account.profileIconId}.png`}
+          />
+        </ListItemIcon>
+        <ListItemText primary={account.summonerName} />
+
+        <IconButton
+          className="listItemChild"
+          onClick={() => {
+            console.log('click edit');
+          }}
+        >
+          <EditRoundedIcon />
+        </IconButton>
+        <IconButton
+          className="listItemChild"
+          onClick={() => {
+            console.log('click fill');
+          }}
+        >
+          <InputRoundedIcon color="secondary" />
+        </IconButton>
+      </ListItem>
+    );
+  }
 
   return useObserver(() => {
     return (

@@ -7,6 +7,8 @@ module.exports = {
     'react/jsx-filename-extension': 'off',
     'import/extensions': 'off',
     'import/no-unresolved': 'off',
+    'no-console': 'off',
+    'no-unused-vars': 'warn',
     'import/no-import-module-exports': 'off',
   },
   parserOptions: {
@@ -28,5 +30,7 @@ module.exports = {
     'import/parsers': {
       '@typescript-eslint/parser': ['.ts', '.tsx'],
     },
+    // unused variables as warnings
+    'no-unused-vars': 'warn',
   },
 };

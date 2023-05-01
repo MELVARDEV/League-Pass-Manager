@@ -2,7 +2,7 @@
 import { nanoid } from 'nanoid';
 import { useObserver } from 'mobx-react-lite';
 import { useAccountStore } from 'renderer/context/AccountContext';
-import { useEffect } from 'react';
+import { useState } from 'react';
 import Account from 'types/Accounts';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -10,31 +10,15 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import AddIcon from '@mui/icons-material/Add';
 import Avatar from '@mui/material/Avatar';
-import { Fab, Icon, IconButton } from '@mui/material';
+import { Fab, IconButton } from '@mui/material';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import InputRoundedIcon from '@mui/icons-material/InputRounded';
+import { ThreeDots } from 'react-loader-spinner';
 // import electron remote fs
-
-import ListItemButton from '@mui/material/ListItemButton';
 
 export default function Home() {
   const accountStore = useAccountStore();
-
-  useEffect(() => {
-    // async function initAccounts() {
-    //   window.electron.ipcRenderer.invoke('main', 'save-accounts', [
-    //     {
-    //       uid: '123',
-    //       summonerName: 'tesddddddt',
-    //       region: 'NA',
-    //       profileIconId: 1045,
-    //       userName: 'test',
-    //       password: 'test',
-    //     },
-    //   ]);
-    // }
-    // initAccounts();
-  }, []);
+  const [isAutoFillRunning, setIsAutoFillRunning] = useState(false);
 
   const addAccount = () => {
     console.log('click add account');
@@ -46,6 +30,17 @@ export default function Home() {
       userName: 'test',
       password: 'test',
     });
+  };
+
+  const handleFill = async (account: Account, setAutoFillRunning: any) => {
+    setAutoFillRunning(true);
+    const res = await window.electron.ipcRenderer.invoke(
+      'main',
+      'auto-fill',
+      account
+    );
+    setAutoFillRunning(false);
+    console.log(res);
   };
 
   function AccountListElement({ account }: { account: Account }) {
@@ -70,10 +65,15 @@ export default function Home() {
         <IconButton
           className="listItemChild"
           onClick={() => {
-            console.log('click fill');
+            handleFill({ ...account }, setIsAutoFillRunning);
           }}
+          disabled={isAutoFillRunning}
         >
-          <InputRoundedIcon color="secondary" />
+          {isAutoFillRunning ? (
+            <ThreeDots height="24" width="24" />
+          ) : (
+            <InputRoundedIcon color="secondary" />
+          )}
         </IconButton>
       </ListItem>
     );

@@ -15,7 +15,9 @@ import log from 'electron-log';
 import fs from 'fs';
 import Account from 'types/Accounts';
 import MenuBuilder from './menu';
-import { resolveHtmlPath } from './util';
+import { resolveHtmlPath, autoFill } from './util';
+
+const isDebug = process.env.NODE_ENV === 'development';
 
 // create documents folder
 const appDataPath = app.getPath('documents');
@@ -73,7 +75,7 @@ const updateAccount = (account: Account) => {
   saveAccounts(accounts);
 };
 
-ipcMain.handle('main', (event, ...args) => {
+ipcMain.handle('main', async (event: any, ...args: any) => {
   switch (args[0]) {
     case 'get-accounts':
       return getAccounts();
@@ -85,6 +87,10 @@ ipcMain.handle('main', (event, ...args) => {
       return removeAccount(args[1]);
     case 'update-account':
       return updateAccount(args[1]);
+    case 'auto-fill':
+      return autoFill(args[1]);
+    case 'close':
+      return app.quit();
     default:
       return 0;
   }
@@ -104,9 +110,6 @@ if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
 }
-
-const isDebug =
-  process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
 if (isDebug) {
   require('electron-debug')();

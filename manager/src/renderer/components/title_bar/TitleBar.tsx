@@ -2,6 +2,10 @@ import { IconButton } from '@mui/material';
 import { Close } from '@mui/icons-material';
 
 export default function TitleBar() {
+  const handleClose = () => {
+    window.electron.ipcRenderer.invoke('main', 'close');
+  };
+
   return (
     <div
       id="titleBar"
@@ -24,7 +28,7 @@ export default function TitleBar() {
           R Account Manager
         </div>
         <div>
-          <IconButton size="small">
+          <IconButton size="small" onClick={handleClose}>
             <Close />
           </IconButton>
         </div>

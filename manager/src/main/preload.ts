@@ -6,7 +6,7 @@ export type Channels = 'main';
 
 const electronHandler = {
   ipcRenderer: {
-    invoke(channel: Channels, ...args: unknown[]) {
+    async invoke(channel: Channels, ...args: unknown[]) {
       return ipcRenderer.invoke(channel, ...args);
     },
     sendMessage(channel: Channels, args: unknown[]) {

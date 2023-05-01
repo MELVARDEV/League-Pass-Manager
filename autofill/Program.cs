@@ -116,7 +116,7 @@ namespace autofill {
 
       // workaround for checkbox.IsToggled = true not working. click and restore mouse position
       var mousePosition = System.Windows.Forms.Cursor.Position;
-      while (!rememberMe.IsChecked == true) {
+      while (!rememberMe.IsChecked == RememberMe) {
         rememberMe.Click();
       }
       System.Windows.Forms.Cursor.Position = mousePosition;
@@ -125,8 +125,8 @@ namespace autofill {
       // get sign in button by name "Sign in" and control type "Button"
       var signInButton = mainWindow.FindFirstDescendant(cf.ByName("Sign in").And(cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button))).AsButton();
 
-      userNameField.Text = "useruuuname";
-      passwordField.Text = "passworssssd";
+      userNameField.Text = UserName;
+      passwordField.Text = Password;
 
       // wait for sign in button to be enabled
       while (!signInButton.AsButton().IsEnabled) {

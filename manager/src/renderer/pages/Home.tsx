@@ -27,6 +27,9 @@ export default function Home() {
       summonerName: 'tesddddddt',
       region: 'NA',
       profileIconId: 1045,
+      tier: 'GOLD',
+      rank: 'I',
+      lp: 100,
       userName: 'test',
       password: 'test',
     });

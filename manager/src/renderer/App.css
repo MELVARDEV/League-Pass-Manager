@@ -9,6 +9,7 @@ body, :root, #root, html {
   margin:0px;
   --border-color: rgba(245, 245, 255, 0.055);
   color:rgb(148, 148, 153);
+  user-select: none;
 }
 
 .page {
@@ -43,7 +44,7 @@ body, :root, #root, html {
 }
 
 .listItemParent:hover{
-  background-color: rgba(195, 197, 202, 0.196);
+  background-color: rgba(195, 197, 202, 0.075);
 
   /* transition: 0.05s ease-out; */
 }

@@ -1,32 +1,75 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 using FlaUI;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Conditions;
 using FlaUI.UIA3;
 
-using PowerArgs;
 
 namespace autofill {
+
   internal class Program {
+    public static void ClickRestoreMousePosition(AutomationElement el) {
+      var mousePosition = System.Windows.Forms.Cursor.Position;
+      el.Click();
+      System.Windows.Forms.Cursor.Position = mousePosition;
+    }
+
     public static string ClientPath = "C:\\Riot Games\\Riot Client\\RiotClientServices.exe";
-    public static string LaunchArgs = "--launch-product=league_of_legends --launch-patchline=live";
+    public static string LaunchArgs = "--launch-product=valorant --launch-patchline=live";
 
     public static Process leagueClientProcess { get; set; }
 
     public static FlaUI.Core.Application app { get; set; }
 
+    static string UserName { get; set; }
+    static string Password { get; set; }
+    static bool RememberMe { get; set; }
+
+    // game type parameter, enforce possible values: "valorant", "league_of_legends", "lor", "tft"
+
+    [System.ComponentModel.DefaultValue("league_of_legends"), RegularExpression("^(valorant|league_of_legends|lor|tft)$")]
+    static string GameType { get; set; }
+
+    public static void ValidateArgs(string[] args) {
+      if (args.Length == 0) {
+        throw new ArgumentException("No arguments provided");
+      }
+
+      try {
+        foreach (var arg in args) {
+          if (arg.Contains("--username=")) {
+            UserName = arg.Split("=")[1];
+          } else if (arg.Contains("--password=")) {
+            Password = arg.Split("=")[1];
+          } else if (arg.Contains("--remember-me=")) {
+            RememberMe = bool.Parse(arg.Split("=")[1]);
+          } else if (arg.Contains("--game-type=")) {
+            GameType = arg.Split("=")[1];
+          }
+        }
+      } catch (System.Exception) {
+
+        throw;
+      }
+
+
+      if (UserName == null || Password == null) {
+        throw new ArgumentException("Username and password are required");
+      }
+
+      if (GameType == null) {
+        throw new ArgumentException("Game type is required");
+      }
+    }
+
     static void Main(string[] args) {
+      ValidateArgs(args);
 
       // launch the client
       try {
-        leagueClientProcess = Process.Start(ClientPath, "--launch-product=league_of_legends --launch-patchline=live");
+        leagueClientProcess = Process.Start(ClientPath, $"--launch-product={GameType} --launch-patchline=live");
       } catch (Exception ex) {
         Console.WriteLine(ex.Message);
       }
@@ -79,18 +122,19 @@ namespace autofill {
       System.Windows.Forms.Cursor.Position = mousePosition;
 
 
-      // get sign in button by name "Sign in"
-      var signInButton = mainWindow.FindFirstDescendant(cf.ByName("Sign in")).AsButton();
+      // get sign in button by name "Sign in" and control type "Button"
+      var signInButton = mainWindow.FindFirstDescendant(cf.ByName("Sign in").And(cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button))).AsButton();
 
       userNameField.Text = "useruuuname";
       passwordField.Text = "passworssssd";
 
       // wait for sign in button to be enabled
       while (!signInButton.AsButton().IsEnabled) {
-        System.Threading.Thread.Sleep(500);
+        System.Threading.Thread.Sleep(200);
       }
 
       signInButton.Invoke();
+
     }
   }
 

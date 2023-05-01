@@ -31,13 +31,11 @@ namespace autofill {
 
       Process[] pname = Process.GetProcessesByName("RiotClientUx");
       while (pname.Length == 0) {
-
         pname = Process.GetProcessesByName("RiotClientUx");
       }
 
       var mainWindowTitle = pname[0].MainWindowTitle;
       while (mainWindowTitle != "Riot Client Main") {
-        // wait 200 ms
         System.Threading.Thread.Sleep(200);
         Process[] proc = Process.GetProcessesByName("RiotClientUx");
         while (proc.Length == 0) {
@@ -47,9 +45,7 @@ namespace autofill {
         if (proc[0].MainWindowTitle == "Riot Client") {
           pname[0] = proc[0];
         }
-
       }
-
 
       var application = FlaUI.Core.Application.Attach(pname[0]);
 
@@ -59,21 +55,15 @@ namespace autofill {
 
       ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
 
-      // try to find the input field for 10 seconds, retry every 500 ms
-
       var inputField = mainWindow.FindFirstDescendant(cf.ByAutomationId("username"));
-
+      var passwordField = mainWindow.FindFirstDescendant(cf.ByAutomationId("password"));
       while (inputField == null) {
         System.Threading.Thread.Sleep(500);
         inputField = mainWindow.FindFirstDescendant(cf.ByAutomationId("username"));
       }
 
-      // set the input field to the username
       inputField.AsTextBox().Text = "username";
-
-
-
-
+      passwordField.AsTextBox().Text = "password";
 
 
     }

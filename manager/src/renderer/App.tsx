@@ -3,7 +3,7 @@ import './App.css';
 import Account from 'types/Accounts';
 import { useAccountStore } from 'renderer/context/AccountContext';
 import { useEffect } from 'react';
-import Home from './pages/Home';
+import Home from './pages/Home/Home';
 import bgKindred from '../../assets/bg_kindred.jpg';
 import {} from '@mui/material';
 import AppDrawer from './components/drawer/Drawer';
@@ -19,7 +19,6 @@ export default function App() {
       );
       accountStore.setAccounts(accounts);
     }
-    console.log(bgKindred);
     initAccounts();
   });
 

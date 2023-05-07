@@ -13,18 +13,8 @@ import TableRow from '@mui/material/TableRow';
 import { sortAccounts } from 'renderer/helpers/AccountHelpers';
 import AddIcon from '@mui/icons-material/Add';
 import Avatar from '@mui/material/Avatar';
-import {
-  Box,
-  Collapse,
-  Fab,
-  IconButton,
-  Paper,
-  Chip,
-  Typography,
-} from '@mui/material';
+import { Collapse, Fab, IconButton, Paper, Chip } from '@mui/material';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 import InputRoundedIcon from '@mui/icons-material/InputRounded';
 import { ThreeDots } from 'react-loader-spinner';
@@ -73,7 +63,7 @@ export default function Home() {
           }}
           className="listItemParent"
         >
-          <TableCell style={{ paddingTop: 0, paddingBottom: 0 }}>
+          <TableCell align="left" style={{ paddingTop: 0, paddingBottom: 0 }}>
             <Avatar
               alt={account.summonerName}
               src={`https://ddragon.leagueoflegends.com/cdn/11.20.1/img/profileicon/${account.profileIconId}.png`}
@@ -81,10 +71,12 @@ export default function Home() {
           </TableCell>
 
           {account.tier && (
-            <TableCell style={{ paddingTop: 0, paddingBottom: 0 }}>
+            <TableCell align="left" style={{ paddingTop: 0, paddingBottom: 0 }}>
               <Avatar
+                className="tierIcon"
+                style={{}}
                 alt={account.summonerName}
-                src={`https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-${account.tier?.toLowerCase()}.png`}
+                src={`https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-mini-crests/${account.tier?.toLowerCase()}.png`}
               />
             </TableCell>
           )}
@@ -135,7 +127,7 @@ export default function Home() {
                     <TableCell>Region</TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody></TableBody>
+                <TableBody>test</TableBody>
               </Table>
             </Collapse>
           </TableCell>
@@ -160,6 +152,8 @@ export default function Home() {
         <TableContainer
           style={{
             marginBottom: 40,
+            paddingLeft: 10,
+            paddingRight: 5,
           }}
         >
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -168,7 +162,7 @@ export default function Home() {
                 {['', '', 'Tier', 'LP', 'Region', 'Name', 'Username', ''].map(
                   (column) => {
                     return (
-                      <TableCell align="left" key={nanoid()}>
+                      <TableCell key={nanoid()}>
                         {column !== '' && (
                           <Chip
                             clickable

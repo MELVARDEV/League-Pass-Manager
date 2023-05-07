@@ -2,6 +2,7 @@
 import Account from '../../types/Accounts';
 
 const tierSortValues = [
+  'UNRANKED',
   'IRON',
   'BRONZE',
   'SILVER',

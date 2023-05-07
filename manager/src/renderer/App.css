@@ -23,7 +23,7 @@ body, :root, #root, html {
   padding: 0px;
   margin:0px;
   --border-color: rgba(245, 245, 255, 0.055);
-  background: rgba(42, 41, 51, 0.747) url('../../assets/bg_kindred.jpg');
+  background: rgba(42, 41, 51, 0.788) url('../../assets/bg_kindred.jpg');
   font-family: league-heading;
   background-blend-mode: darken;
   font-family: league-regular;
@@ -32,6 +32,13 @@ body, :root, #root, html {
   color:rgba(239, 239, 248, 0.815);
   text-shadow: #252323a7 0px 0px 5px;
   user-select: none;
+}
+
+.addAccountModal {
+  padding: 5px 20px 20px 20px;
+  background:rgba(26, 26, 31, 0.733);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .page {
@@ -80,10 +87,10 @@ table th {
   color: rgba(248, 240, 255, 0.719) !important;
 }
 
-tr td:last-child {
+/* tr td:last-child::before {
   width: 1%;
   white-space: nowrap;
-}
+} */
 
 
 table tr {
@@ -92,6 +99,7 @@ table tr {
 
 table tr td {
   padding: 4px !important;
+  text-align: center !important;
 }
 
 table tbody tr {

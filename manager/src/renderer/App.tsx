@@ -4,7 +4,6 @@ import Account from 'types/Accounts';
 import { useAccountStore } from 'renderer/context/AccountContext';
 import { useEffect } from 'react';
 import Home from './pages/Home/Home';
-import bgKindred from '../../assets/bg_kindred.jpg';
 import {} from '@mui/material';
 import AppDrawer from './components/drawer/Drawer';
 import TitleBar from './components/title_bar/TitleBar';

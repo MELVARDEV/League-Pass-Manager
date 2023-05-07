@@ -13,8 +13,18 @@ import TableRow from '@mui/material/TableRow';
 import { sortAccounts } from 'renderer/helpers/AccountHelpers';
 import AddIcon from '@mui/icons-material/Add';
 import Avatar from '@mui/material/Avatar';
-import { Fab, IconButton, Paper } from '@mui/material';
+import {
+  Box,
+  Collapse,
+  Fab,
+  IconButton,
+  Paper,
+  Typography,
+} from '@mui/material';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+
 import InputRoundedIcon from '@mui/icons-material/InputRounded';
 import { ThreeDots } from 'react-loader-spinner';
 // import electron remote fs
@@ -52,64 +62,84 @@ export default function Home() {
   };
 
   function AccountListElement({ account }: { account: Account }) {
-    return (
-      <TableRow
-        sx={{
-          border: 'none !important',
-        }}
-        className="listItemParent"
-      >
-        <TableCell>
-          <Avatar
-            alt={account.summonerName}
-            src={`https://ddragon.leagueoflegends.com/cdn/11.20.1/img/profileicon/${account.profileIconId}.png`}
-          />
-        </TableCell>
+    const [open, setOpen] = useState(false);
 
-        {account.tier && (
-          <TableCell>
+    return (
+      <>
+        <TableRow
+          sx={{
+            border: 'none !important',
+          }}
+          className="listItemParent"
+        >
+          <TableCell style={{ paddingTop: 0, paddingBottom: 0 }}>
             <Avatar
-              sx={{ width: 40, height: 40 }}
               alt={account.summonerName}
-              src={`https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-${account.tier?.toLowerCase()}.png`}
+              src={`https://ddragon.leagueoflegends.com/cdn/11.20.1/img/profileicon/${account.profileIconId}.png`}
             />
           </TableCell>
-        )}
 
-        {account.tier && (
-          <TableCell>{`${account.tier} ${account.rank}`}</TableCell>
-        )}
+          {account.tier && (
+            <TableCell style={{ paddingTop: 0, paddingBottom: 0 }}>
+              <Avatar
+                alt={account.summonerName}
+                src={`https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-${account.tier?.toLowerCase()}.png`}
+              />
+            </TableCell>
+          )}
 
-        {account.lp && <TableCell>{account.lp}</TableCell>}
+          {account.tier && (
+            <TableCell>{`${account.tier} ${account.rank}`}</TableCell>
+          )}
 
-        <TableCell>{account.summonerName}</TableCell>
+          {account.lp && <TableCell>{account.lp}</TableCell>}
 
-        <TableCell>{account.userName}</TableCell>
+          <TableCell>{account.region && account.region}</TableCell>
 
-        <TableCell>
-          <IconButton
-            className="listItemChild"
-            onClick={() => {
-              console.log('click edit');
-            }}
-          >
-            <EditRoundedIcon />
-          </IconButton>
-          <IconButton
-            className="listItemChild"
-            onClick={() => {
-              handleFill({ ...account }, setIsAutoFillRunning);
-            }}
-            disabled={isAutoFillRunning}
-          >
-            {isAutoFillRunning ? (
-              <ThreeDots height="24" width="24" />
-            ) : (
-              <InputRoundedIcon color="secondary" />
-            )}
-          </IconButton>
-        </TableCell>
-      </TableRow>
+          <TableCell>{account.summonerName}</TableCell>
+
+          <TableCell>{account.userName}</TableCell>
+
+          <TableCell>
+            <IconButton
+              className="listItemChild"
+              onClick={() => setOpen(!open)}
+            >
+              <EditRoundedIcon />
+            </IconButton>
+            <IconButton
+              className="listItemChild"
+              onClick={() => {
+                handleFill({ ...account }, setIsAutoFillRunning);
+              }}
+              disabled={isAutoFillRunning}
+            >
+              {isAutoFillRunning ? (
+                <ThreeDots height="24" width="24" />
+              ) : (
+                <InputRoundedIcon color="secondary" />
+              )}
+            </IconButton>
+          </TableCell>
+        </TableRow>
+        <TableRow className="dropDownRow">
+          <TableCell style={{ paddingBottom: 15, paddingTop: 15 }} colSpan={7}>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <Table component={Paper} style={{ width: '100%' }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Username</TableCell>
+                    <TableCell>Password</TableCell>
+                    <TableCell>Region</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody></TableBody>
+              </Table>
+            </Collapse>
+          </TableCell>
+        </TableRow>
+      </>
     );
   }
 
@@ -134,7 +164,7 @@ export default function Home() {
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
-                {['', '', 'Tier', 'LP', 'Summoner Name', 'Username', ''].map(
+                {['', '', 'Tier', 'LP', 'Region', 'Name', 'Username', ''].map(
                   (column) => {
                     return (
                       <TableCell

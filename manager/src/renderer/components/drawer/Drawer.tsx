@@ -1,6 +1,6 @@
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import ArrowRightRoundedIcon from '@mui/icons-material/ArrowRightRounded';
-import { Button } from '@mui/material';
+import { Button, IconButton } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 export default function AppDrawer() {
@@ -25,26 +25,24 @@ export default function AppDrawer() {
       style={{
         alignSelf: 'flex-start',
         height: '100%',
+        display: 'flex',
         padding: '10px 5px 10px 5px',
       }}
     >
-      <div>
+      <div style={{ width: '100%' }}>
         {routes.map((route) => (
-          <Button
+          <IconButton
             key={route.name}
-            variant="text"
-            startIcon={route.icon}
-            endIcon={
-              currentRoute === route.path ? <ArrowRightRoundedIcon /> : null
+            color={
+              window.location.pathname === route.path ? 'primary' : 'default'
             }
-            fullWidth
             onClick={() => {
               setCurrentRoute(route.path);
               window.location.pathname = route.path;
             }}
           >
-            {route.name}
-          </Button>
+            {route.icon}
+          </IconButton>
         ))}
       </div>
     </div>

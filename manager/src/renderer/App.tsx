@@ -4,7 +4,7 @@ import Account from 'types/Accounts';
 import { useAccountStore } from 'renderer/context/AccountContext';
 import { useEffect } from 'react';
 import Home from './pages/Home';
-
+import bgKindred from '../../assets/bg_kindred.jpg';
 import {} from '@mui/material';
 import AppDrawer from './components/drawer/Drawer';
 import TitleBar from './components/title_bar/TitleBar';
@@ -19,16 +19,28 @@ export default function App() {
       );
       accountStore.setAccounts(accounts);
     }
+    console.log(bgKindred);
     initAccounts();
   });
 
   return (
     <div
-      style={{ height: '100%', display: 'flex', margin: 0, flexFlow: 'column' }}
+      style={{
+        height: '100%',
+        display: 'flex',
+        margin: 0,
+        flexFlow: 'column',
+      }}
     >
       <TitleBar />
-      <div style={{ display: 'flex', flexGrow: 1, height: '100%' }}>
-        {/* <AppDrawer /> */}
+      <div
+        style={{
+          display: 'flex',
+          flexGrow: 1,
+          height: '100%',
+        }}
+      >
+        <AppDrawer />
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />

@@ -19,6 +19,7 @@ import {
   Fab,
   IconButton,
   Paper,
+  Chip,
   Typography,
 } from '@mui/material';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
@@ -123,7 +124,7 @@ export default function Home() {
           </TableCell>
         </TableRow>
         <TableRow className="dropDownRow">
-          <TableCell style={{ paddingBottom: 15, paddingTop: 15 }} colSpan={7}>
+          <TableCell style={{ paddingBottom: 15, paddingTop: 15 }} colSpan={8}>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <Table component={Paper} style={{ width: '100%' }}>
                 <TableHead>
@@ -158,7 +159,7 @@ export default function Home() {
       <div className="page">
         <TableContainer
           style={{
-            marginBottom: 45,
+            marginBottom: 40,
           }}
         >
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -167,13 +168,17 @@ export default function Home() {
                 {['', '', 'Tier', 'LP', 'Region', 'Name', 'Username', ''].map(
                   (column) => {
                     return (
-                      <TableCell
-                        key={nanoid()}
-                        onClick={() => {
-                          handleHeaderColumnClick(column);
-                        }}
-                      >
-                        {sortBy === column ? `[${column}]` : column}
+                      <TableCell align="left" key={nanoid()}>
+                        {column !== '' && (
+                          <Chip
+                            clickable
+                            onClick={() => {
+                              handleHeaderColumnClick(column);
+                            }}
+                            color={sortBy === column ? 'primary' : 'default'}
+                            label={column}
+                          />
+                        )}
                       </TableCell>
                     );
                   }
@@ -198,6 +203,7 @@ export default function Home() {
           }}
           onClick={addAccount}
           color="primary"
+          size="small"
           aria-label="add"
         >
           <AddIcon />

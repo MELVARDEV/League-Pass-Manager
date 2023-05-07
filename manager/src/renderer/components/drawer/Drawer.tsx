@@ -33,10 +33,9 @@ export default function AppDrawer() {
         {routes.map((route) => (
           <IconButton
             key={route.name}
-            color={
-              window.location.pathname === route.path ? 'primary' : 'default'
-            }
+            color={currentRoute === route.path ? 'primary' : 'default'}
             onClick={() => {
+              if (currentRoute === route.path) return;
               setCurrentRoute(route.path);
               window.location.pathname = route.path;
             }}

@@ -25,7 +25,7 @@ body, :root, #root, html {
   /* border-top: 1px solid var(--border-color); */
   /* border-top-left-radius: 8px; */
   /* padding, 10px horizontal, 5 vertical */
-  padding: 12px 20px 12px 20px;
+  padding: 0px 15px 0px 15px;
   /* border-left: 1px solid var(--border-color); */
   /* gradient */
 
@@ -54,13 +54,16 @@ body, :root, #root, html {
   /* transition: 0.05s ease-out; */
 }
 
+
+
 table td {
   border:0 !important;
+  color: rgba(248, 240, 255, 0.719) !important;
 }
 
 table th {
   border-bottom:none !important;
-
+  color: rgba(248, 240, 255, 0.719) !important;
 }
 
 tr td:last-child {
@@ -76,29 +79,30 @@ table tr td {
   padding: 4px !important;
 }
 
+table tbody tr {
+  overflow: visible;
+  background-color: rgba(0, 0, 0, 0);
+
+  transition: all .2s ease-out;
+}
+
 table tbody tr:hover {
-  background-color: rgba(206, 68, 86, 0.349);
-  border-radius: 20px;
+
+  background-color: rgba(134, 57, 122, 0.719);
 }
 
-td {
-  /* border: solid 1px #000; */
-  border-style: solid none;
-  padding: 10px;
 
-}
 td:first-child {
-  border-left-style: solid;
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
 }
 td:last-child {
-  border-right-style: solid;
   border-bottom-right-radius: 10px;
   border-top-right-radius: 10px;
 }
-table tr.dropDownRow:hover{
+table tr.dropDownRow{
   background-color: unset !important;
+  background: none !important;
 }
 
 

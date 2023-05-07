@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { nanoid } from 'nanoid';
 import { useObserver } from 'mobx-react-lite';
@@ -12,12 +13,9 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { sortAccounts } from 'renderer/helpers/AccountHelpers';
 import AddIcon from '@mui/icons-material/Add';
-import Avatar from '@mui/material/Avatar';
-import { Collapse, Fab, IconButton, Paper, Chip } from '@mui/material';
-import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import { Fab, Chip, Modal, Autocomplete, TextField } from '@mui/material';
+import AccountListElement from './AccountListElement';
 
-import InputRoundedIcon from '@mui/icons-material/InputRounded';
-import { ThreeDots } from 'react-loader-spinner';
 // import electron remote fs
 
 export default function Home() {
@@ -25,21 +23,18 @@ export default function Home() {
   const [isAutoFillRunning, setIsAutoFillRunning] = useState(false);
   const [sortBy, setSortBy] = useState('LP');
   const [sortDescending, setSortDescending] = useState(false);
+  const [addAccountModalOpen, setAddAccountModalOpen] = useState(false);
 
-  const addAccount = () => {
-    console.log('click add account');
-    accountStore.addAccount({
-      uid: nanoid(),
-      summonerName: 'zupka',
-      region: 'NA',
-      profileIconId: 1045,
-      tier: 'DIAMOND',
-      rank: 'I',
-      lp: 60,
-      userName: 'test',
-      password: 'test',
-    });
-  };
+  // const addAccount = () => {
+  //   console.log('click add account');
+  //   accountStore.addAccount({
+  //     uid: nanoid(),
+  //     summonerName: 'Sono un campione',
+  //     region: 'EUNE',
+  //     userName: 'test',
+  //     password: 'test',
+  //   });
+  // };
 
   const handleFill = async (account: Account, setAutoFillRunning: any) => {
     setAutoFillRunning(true);
@@ -52,90 +47,6 @@ export default function Home() {
     console.log(res);
   };
 
-  function AccountListElement({ account }: { account: Account }) {
-    const [open, setOpen] = useState(false);
-
-    return (
-      <>
-        <TableRow
-          sx={{
-            border: 'none !important',
-          }}
-          className="listItemParent"
-        >
-          <TableCell align="left" style={{ paddingTop: 0, paddingBottom: 0 }}>
-            <Avatar
-              alt={account.summonerName}
-              src={`https://ddragon.leagueoflegends.com/cdn/11.20.1/img/profileicon/${account.profileIconId}.png`}
-            />
-          </TableCell>
-
-          {account.tier && (
-            <TableCell align="left" style={{ paddingTop: 0, paddingBottom: 0 }}>
-              <Avatar
-                className="tierIcon"
-                style={{}}
-                alt={account.summonerName}
-                src={`https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-mini-crests/${account.tier?.toLowerCase()}.png`}
-              />
-            </TableCell>
-          )}
-
-          {account.tier && (
-            <TableCell>{`${account.tier} ${account.rank}`}</TableCell>
-          )}
-
-          {account.lp && <TableCell>{account.lp}</TableCell>}
-
-          <TableCell>{account.region && account.region}</TableCell>
-
-          <TableCell>{account.summonerName}</TableCell>
-
-          <TableCell>{account.userName}</TableCell>
-
-          <TableCell>
-            <IconButton
-              className="listItemChild"
-              onClick={() => setOpen(!open)}
-            >
-              <EditRoundedIcon />
-            </IconButton>
-            <IconButton
-              className="listItemChild"
-              onClick={() => {
-                handleFill({ ...account }, setIsAutoFillRunning);
-              }}
-              disabled={isAutoFillRunning}
-            >
-              {isAutoFillRunning ? (
-                <ThreeDots height="24" width="24" />
-              ) : (
-                <InputRoundedIcon color="secondary" />
-              )}
-            </IconButton>
-          </TableCell>
-        </TableRow>
-        <TableRow className="dropDownRow">
-          <TableCell style={{ paddingBottom: 15, paddingTop: 15 }} colSpan={8}>
-            <Collapse in={open} timeout="auto" unmountOnExit>
-              <Table component={Paper} style={{ width: '100%' }}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Username</TableCell>
-                    <TableCell>Password</TableCell>
-                    <TableCell>Region</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>test</TableBody>
-              </Table>
-            </Collapse>
-          </TableCell>
-        </TableRow>
-      </>
-    );
-  }
-
   const handleHeaderColumnClick = (column: string) => {
     if (column === '') return;
     if (sortBy === column && sortDescending) {
@@ -146,9 +57,40 @@ export default function Home() {
     setSortBy(column);
   };
 
+  const availableRegions = ['BR', 'EUNE', 'EUW', 'NA', 'OC', 'RU', 'TR', 'US'];
+
+  function AddAccountModal() {
+    return (
+      <Modal
+        open={addAccountModalOpen}
+        onClose={() => setAddAccountModalOpen(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backdropFilter: 'blur(10px)',
+        }}
+      >
+        <div className="addAccountModal">
+          <h3>Region</h3>
+          <Autocomplete
+            disablePortal
+            id="combo-box-demo"
+            options={availableRegions}
+            sx={{ width: 100 }}
+            renderInput={(params) => <TextField {...params} label="Region" />}
+          />
+        </div>
+      </Modal>
+    );
+  }
+
   return useObserver(() => {
     return (
       <div className="page">
+        <AddAccountModal />
         <TableContainer
           style={{
             marginBottom: 40,
@@ -159,24 +101,32 @@ export default function Home() {
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
-                {['', '', 'Tier', 'LP', 'Region', 'Name', 'Username', ''].map(
-                  (column) => {
-                    return (
-                      <TableCell key={nanoid()}>
-                        {column !== '' && (
-                          <Chip
-                            clickable
-                            onClick={() => {
-                              handleHeaderColumnClick(column);
-                            }}
-                            color={sortBy === column ? 'primary' : 'default'}
-                            label={column}
-                          />
-                        )}
-                      </TableCell>
-                    );
-                  }
-                )}
+                {[
+                  '',
+                  '',
+                  'Tier',
+                  'LP',
+                  'Level',
+                  'Region',
+                  'Name',
+                  'Username',
+                  '',
+                ].map((column) => {
+                  return (
+                    <TableCell align="center" key={nanoid()}>
+                      {column !== '' && (
+                        <Chip
+                          clickable
+                          onClick={() => {
+                            handleHeaderColumnClick(column);
+                          }}
+                          color={sortBy === column ? 'primary' : 'default'}
+                          label={column}
+                        />
+                      )}
+                    </TableCell>
+                  );
+                })}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -184,7 +134,13 @@ export default function Home() {
                 .slice()
                 .sort((a, b) => sortAccounts(a, b, sortBy, sortDescending))
                 .map((account) => (
-                  <AccountListElement key={account.uid} account={account} />
+                  <AccountListElement
+                    handleFill={handleFill}
+                    isAutoFillRunning={isAutoFillRunning}
+                    setIsAutoFillRunning={setIsAutoFillRunning}
+                    key={account.uid}
+                    account={account}
+                  />
                 ))}
             </TableBody>
           </Table>
@@ -195,7 +151,7 @@ export default function Home() {
             bottom: 16,
             right: 16,
           }}
-          onClick={addAccount}
+          onClick={() => setAddAccountModalOpen(true)}
           color="primary"
           size="small"
           aria-label="add"

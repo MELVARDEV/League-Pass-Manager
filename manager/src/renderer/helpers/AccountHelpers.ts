@@ -2,6 +2,7 @@
 import Account from '../../types/Accounts';
 
 const tierSortValues = [
+  '',
   'UNRANKED',
   'IRON',
   'BRONZE',
@@ -14,7 +15,7 @@ const tierSortValues = [
   'CHALLENGER',
 ];
 
-const rankSortValues = ['I', 'II', 'III', 'IV', 'V'];
+const rankSortValues = ['', 'I', 'II', 'III', 'IV', 'V'];
 
 export const sortAccounts = (
   a: Account,
@@ -40,20 +41,26 @@ export const sortAccounts = (
     return 0;
   };
 
-  if (by === 'LP') {
-    if (a.lp && b.lp) {
+  const byNumberHelper = (an?: number, bn?: number) => {
+    if (an && bn) {
       if (descending) {
-        return a.lp - b.lp;
+        return an - bn;
       }
-      return b.lp - a.lp;
+      return bn - an;
     }
-    if (a.lp) {
+    if (an) {
       return -1;
     }
-    if (b.lp) {
+    if (bn) {
       return 1;
     }
+    return 0;
+  };
+
+  if (by === 'LP') {
+    return byNumberHelper(a.lp, b.lp);
   }
+
   if (by === 'Tier') {
     // sort by tier and then rank
     if (a.tier && b.tier) {
@@ -79,11 +86,14 @@ export const sortAccounts = (
       return 1;
     }
   }
-  if (by === 'Summoner Name') {
+  if (by === 'Name') {
     return byTextHelper(a.summonerName, b.summonerName);
   }
   if (by === 'Username') {
     return byTextHelper(a.userName, b.userName);
+  }
+  if (by === 'Level') {
+    return byNumberHelper(a.summonerLevel, b.summonerLevel);
   }
 
   return 0;

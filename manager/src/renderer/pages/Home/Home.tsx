@@ -13,7 +13,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { sortAccounts } from 'renderer/helpers/AccountHelpers';
 import AddIcon from '@mui/icons-material/Add';
-import { Fab, Chip, Modal, Autocomplete, TextField } from '@mui/material';
+import { Fab, Chip } from '@mui/material';
+
 import AccountListElement from './AccountListElement';
 
 // import electron remote fs
@@ -23,18 +24,6 @@ export default function Home() {
   const [isAutoFillRunning, setIsAutoFillRunning] = useState(false);
   const [sortBy, setSortBy] = useState('LP');
   const [sortDescending, setSortDescending] = useState(false);
-  const [addAccountModalOpen, setAddAccountModalOpen] = useState(false);
-
-  // const addAccount = () => {
-  //   console.log('click add account');
-  //   accountStore.addAccount({
-  //     uid: nanoid(),
-  //     summonerName: 'Sono un campione',
-  //     region: 'EUNE',
-  //     userName: 'test',
-  //     password: 'test',
-  //   });
-  // };
 
   const handleFill = async (account: Account, setAutoFillRunning: any) => {
     setAutoFillRunning(true);
@@ -57,40 +46,9 @@ export default function Home() {
     setSortBy(column);
   };
 
-  const availableRegions = ['BR', 'EUNE', 'EUW', 'NA', 'OC', 'RU', 'TR', 'US'];
-
-  function AddAccountModal() {
-    return (
-      <Modal
-        open={addAccountModalOpen}
-        onClose={() => setAddAccountModalOpen(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backdropFilter: 'blur(10px)',
-        }}
-      >
-        <div className="addAccountModal">
-          <h3>Region</h3>
-          <Autocomplete
-            disablePortal
-            id="combo-box-demo"
-            options={availableRegions}
-            sx={{ width: 100 }}
-            renderInput={(params) => <TextField {...params} label="Region" />}
-          />
-        </div>
-      </Modal>
-    );
-  }
-
   return useObserver(() => {
     return (
       <div className="page">
-        <AddAccountModal />
         <TableContainer
           style={{
             marginBottom: 40,
@@ -151,7 +109,6 @@ export default function Home() {
             bottom: 16,
             right: 16,
           }}
-          onClick={() => setAddAccountModalOpen(true)}
           color="primary"
           size="small"
           aria-label="add"

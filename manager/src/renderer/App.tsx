@@ -4,6 +4,7 @@ import Account from 'types/Accounts';
 import { useAccountStore } from 'renderer/context/AccountContext';
 import { useEffect } from 'react';
 import Home from './pages/Home/Home';
+import AddAccount from './pages/AddAccount/AddAccount';
 import {} from '@mui/material';
 import AppDrawer from './components/drawer/Drawer';
 import TitleBar from './components/title_bar/TitleBar';
@@ -22,29 +23,31 @@ export default function App() {
   });
 
   return (
-    <div
-      style={{
-        height: '100%',
-        display: 'flex',
-        margin: 0,
-        flexFlow: 'column',
-      }}
-    >
-      <TitleBar />
+    <Router>
       <div
         style={{
-          display: 'flex',
-          flexGrow: 1,
           height: '100%',
+          display: 'flex',
+          margin: 0,
+          flexFlow: 'column',
         }}
       >
-        <AppDrawer />
-        <Router>
+        <TitleBar />
+        <div
+          style={{
+            display: 'flex',
+            flexGrow: 1,
+            height: '100%',
+          }}
+        >
+          <AppDrawer />
+
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/add-account" element={<AddAccount />} />
           </Routes>
-        </Router>
+        </div>
       </div>
-    </div>
+    </Router>
   );
 }

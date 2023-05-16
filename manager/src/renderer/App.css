@@ -38,6 +38,7 @@ body, :root, #root, html {
   padding: 5px 20px 20px 20px;
   background:rgba(26, 26, 31, 0.733);
   border-radius: 12px;
+  min-width: 50%;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 

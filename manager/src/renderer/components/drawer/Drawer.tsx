@@ -1,9 +1,12 @@
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
+import { VerifiedUser } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function AppDrawer() {
   const [currentRoute, setCurrentRoute] = useState('/');
+  const navigate = useNavigate();
 
   useEffect(() => {
     setCurrentRoute(window.location.pathname);
@@ -16,6 +19,11 @@ export default function AppDrawer() {
       path: '/',
       icon: <HomeRoundedIcon />,
     },
+    {
+      name: 'Add Account',
+      path: '/add-account',
+      icon: <VerifiedUser />,
+    },
   ];
 
   return (
@@ -25,24 +33,23 @@ export default function AppDrawer() {
         alignSelf: 'flex-start',
         height: '100%',
         display: 'flex',
+        flexDirection: 'column',
         padding: '10px 5px 10px 5px',
       }}
     >
-      <div style={{ width: '100%' }}>
-        {routes.map((route) => (
-          <IconButton
-            key={route.name}
-            color={currentRoute === route.path ? 'primary' : 'default'}
-            onClick={() => {
-              if (currentRoute === route.path) return;
-              setCurrentRoute(route.path);
-              window.location.pathname = route.path;
-            }}
-          >
-            {route.icon}
-          </IconButton>
-        ))}
-      </div>
+      {routes.map((route) => (
+        <IconButton
+          key={route.name}
+          color={currentRoute === route.path ? 'primary' : 'default'}
+          onClick={() => {
+            if (currentRoute === route.path) return;
+            setCurrentRoute(route.path);
+            navigate(route.path);
+          }}
+        >
+          {route.icon}
+        </IconButton>
+      ))}
     </div>
   );
 }

@@ -4,13 +4,13 @@ type Account = {
   summonerName: string;
   summonerLevel?: number;
   region: string;
-  description: string;
+  description?: string;
   userName: string;
   password: string;
-  tier: string;
+  tier?: string;
   rank: string;
   lp: number;
-  profileIconId: number;
+  profileIconId?: number;
   allowFetch: boolean;
   lastFetchedAt?: Date;
 };

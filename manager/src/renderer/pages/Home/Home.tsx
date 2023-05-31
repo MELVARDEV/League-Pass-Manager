@@ -14,6 +14,7 @@ import TableRow from '@mui/material/TableRow';
 import { sortAccounts } from 'renderer/helpers/AccountHelpers';
 import AddIcon from '@mui/icons-material/Add';
 import { Fab, Chip } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 import AccountListElement from './AccountListElement';
 
@@ -22,6 +23,7 @@ import AccountListElement from './AccountListElement';
 export default function Home() {
   const accountStore = useAccountStore();
   const [isAutoFillRunning, setIsAutoFillRunning] = useState(false);
+  const navigate = useNavigate();
   const [sortBy, setSortBy] = useState('LP');
   const [sortDescending, setSortDescending] = useState(false);
 
@@ -108,6 +110,9 @@ export default function Home() {
             position: 'absolute',
             bottom: 16,
             right: 16,
+          }}
+          onClick={() => {
+            navigate('/add-account');
           }}
           color="primary"
           size="small"

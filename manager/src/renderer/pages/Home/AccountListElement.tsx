@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ThreeDots } from 'react-loader-spinner';
 import Account from 'types/Accounts';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
-
+import { useNavigate } from 'react-router-dom';
 import InputRoundedIcon from '@mui/icons-material/InputRounded';
 
 export default function AccountListElement({
@@ -18,6 +18,7 @@ export default function AccountListElement({
   setIsAutoFillRunning: any;
 }) {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
   return (
     <TableRow
       sx={{
@@ -61,7 +62,12 @@ export default function AccountListElement({
       <TableCell>{account.summonerName}</TableCell>
       <TableCell>{account.userName}</TableCell>
       <TableCell>
-        <IconButton className="listItemChild" onClick={() => setOpen(!open)}>
+        <IconButton
+          className="listItemChild"
+          onClick={() => {
+            navigate(`/edit-account/${account.uid}`);
+          }}
+        >
           <EditRoundedIcon />
         </IconButton>
         <IconButton

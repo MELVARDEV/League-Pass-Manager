@@ -1,14 +1,16 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import React, { useState } from 'react';
-import { nanoid } from 'nanoid';
-import { useObserver } from 'mobx-react-lite';
-import { useAccountStore } from 'renderer/context/AccountContext';
 import Account from 'types/Accounts';
+import { useParams } from 'react-router-dom';
+import { useObserver } from 'mobx-react-lite';
+import { useEffect, useState } from 'react';
+import { useAccountStore } from 'renderer/context/AccountContext';
 import { Autocomplete, Button, Snackbar, TextField } from '@mui/material';
 
-function AddAccount() {
+export default function EditAccount() {
   const accountStore = useAccountStore();
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  const [account, setAccount] = useState<Account>();
+  const { id } = useParams();
+
   const [newAccountInputs, setNewAccountInputs] = useState({
     region: '',
     summonerName: '',
@@ -22,21 +24,6 @@ function AddAccount() {
       ...prevState,
       [name]: value,
     }));
-  };
-
-  const handleAddAccount = async () => {
-    setSnackbarOpen(true);
-    const newAccount: Account = {
-      uid: nanoid(),
-      region: newAccountInputs.region,
-      summonerName: newAccountInputs.summonerName,
-      userName: newAccountInputs.userName,
-      password: newAccountInputs.password,
-      lp: 0,
-      rank: '',
-      allowFetch: true,
-    };
-    await accountStore.addAccount(newAccount);
   };
 
   const availableRegions = [
@@ -55,7 +42,21 @@ function AddAccount() {
     'PBE',
   ];
 
+  useEffect(() => {
+    if (!id) return;
+    const a = accountStore.getAccount(id);
+    if (!a) return;
+    setAccount(a);
+    setNewAccountInputs({
+      region: a.region,
+      summonerName: a.summonerName,
+      userName: a.userName,
+      password: a.password,
+    });
+  }, [accountStore, id]);
+
   return useObserver(() => {
+    if (!account) return null;
     return (
       <div className="page">
         <div className="addAccountModal" style={{ margin: 20 }}>
@@ -64,6 +65,7 @@ function AddAccount() {
             id="combo-box-demo"
             options={availableRegions}
             sx={{ width: '100%' }}
+            defaultValue={account.region}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -80,6 +82,7 @@ function AddAccount() {
             sx={{ width: '100%' }}
             onChange={handleInputChange}
             id="outlined-basic"
+            defaultValue={account.summonerName}
             label="Summoner Name"
             variant="outlined"
           />
@@ -90,6 +93,7 @@ function AddAccount() {
             sx={{ width: '100%' }}
             onChange={handleInputChange}
             id="outlined-basic"
+            defaultValue={account.userName}
             label="Username"
             variant="outlined"
           />
@@ -100,28 +104,19 @@ function AddAccount() {
             type="password"
             onChange={handleInputChange}
             id="outlined-basic"
+            defaultValue={account.password}
             label="Password"
             variant="outlined"
           />
           <Button
             sx={{ width: '100%', marginTop: 4 }}
-            onClick={() => {
-              handleAddAccount();
-            }}
+            onClick={() => {}}
             variant="contained"
           >
-            Add Account
+            Save Account
           </Button>
         </div>
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={6000}
-          onClose={() => setSnackbarOpen(false)}
-          message="Account added"
-        />
       </div>
     );
   });
 }
-
-export default AddAccount;

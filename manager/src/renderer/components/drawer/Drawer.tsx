@@ -2,15 +2,16 @@ import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import { VerifiedUser } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function AppDrawer() {
   const [currentRoute, setCurrentRoute] = useState('/');
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    setCurrentRoute(window.location.pathname);
-  }, []);
+    setCurrentRoute(location.pathname);
+  }, [location]);
 
   // button for each route
   const routes = [

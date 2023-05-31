@@ -8,6 +8,7 @@ import AddAccount from './pages/AddAccount/AddAccount';
 import {} from '@mui/material';
 import AppDrawer from './components/drawer/Drawer';
 import TitleBar from './components/title_bar/TitleBar';
+import EditAccount from './pages/AddAccount/EditAccount';
 
 export default function App() {
   const accountStore = useAccountStore();
@@ -45,6 +46,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/add-account" element={<AddAccount />} />
+            <Route path="/edit-account/:id" element={<EditAccount />} />
           </Routes>
         </div>
       </div>

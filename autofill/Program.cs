@@ -67,6 +67,13 @@ namespace autofill {
     static void Main(string[] args) {
       ValidateArgs(args);
 
+      string sessionFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Riot Games" + Path.DirectorySeparatorChar + "Riot Client" + Path.DirectorySeparatorChar + "Data" + Path.DirectorySeparatorChar + "RiotGamesPrivateSettings.yaml");
+
+      // delete session file if it exists
+      if (File.Exists(sessionFilePath)) {
+        File.Delete(sessionFilePath);
+      }
+
       // launch the client
       try {
         leagueClientProcess = Process.Start(ClientPath, $"--launch-product={GameType} --launch-patchline=live");
@@ -128,9 +135,19 @@ namespace autofill {
       userNameField.Text = UserName;
       passwordField.Text = Password;
 
+      // create timeout timer
+      var timeoutTimer = new Stopwatch();
+
+      // start timer
+      timeoutTimer.Start();
+
       // wait for sign in button to be enabled
       while (!signInButton.AsButton().IsEnabled) {
         System.Threading.Thread.Sleep(200);
+        if (timeoutTimer.ElapsedMilliseconds > 30000) {
+          // quit silently if timeout
+          Environment.Exit(0);
+        }
       }
 
       signInButton.Invoke();

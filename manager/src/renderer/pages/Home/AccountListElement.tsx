@@ -1,10 +1,23 @@
-import { Avatar, IconButton, TableCell, TableRow } from '@mui/material';
-import { useState } from 'react';
+/* eslint-disable react/jsx-props-no-spreading */
+import {
+  Avatar,
+  Divider,
+  IconButton,
+  ListItemIcon,
+  MenuItem,
+  TableCell,
+  TableRow,
+} from '@mui/material';
 import { ThreeDots } from 'react-loader-spinner';
 import Account from 'types/Accounts';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import { useNavigate } from 'react-router-dom';
 import InputRoundedIcon from '@mui/icons-material/InputRounded';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
+import Menu from '@mui/material/Menu';
+import { DeleteForever } from '@mui/icons-material';
+import { useAccountStore } from 'renderer/context/AccountContext';
 
 export default function AccountListElement({
   account,
@@ -17,8 +30,13 @@ export default function AccountListElement({
   handleFill: any;
   setIsAutoFillRunning: any;
 }) {
-  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const accountStore = useAccountStore();
+
+  const handleDelete = async () => {
+    await accountStore.removeAccount(account.uid);
+  };
+
   return (
     <TableRow
       sx={{
@@ -62,14 +80,44 @@ export default function AccountListElement({
       <TableCell>{account.summonerName}</TableCell>
       <TableCell>{account.userName}</TableCell>
       <TableCell>
-        <IconButton
-          className="listItemChild"
-          onClick={() => {
-            navigate(`/edit-account/${account.uid}`);
-          }}
-        >
-          <EditRoundedIcon />
-        </IconButton>
+        <PopupState variant="popover" popupId="demo-popup-menu">
+          {(popupState: any) => (
+            <>
+              <IconButton
+                {...bindTrigger(popupState)}
+                className="listItemChild"
+              >
+                <MoreHorizIcon />
+              </IconButton>
+              <Menu {...bindMenu(popupState)}>
+                <MenuItem
+                  onClick={() => {
+                    popupState.close();
+                    navigate(`/edit-account/${account.uid}`);
+                  }}
+                >
+                  <ListItemIcon>
+                    <EditRoundedIcon fontSize="small" />
+                  </ListItemIcon>
+                  Edit account
+                </MenuItem>
+                <Divider sx={{ my: 0.5 }} />
+                <MenuItem
+                  onClick={() => {
+                    handleDelete();
+                    popupState.close();
+                  }}
+                >
+                  <ListItemIcon>
+                    <DeleteForever fontSize="small" />
+                  </ListItemIcon>
+                  Remove account
+                </MenuItem>
+              </Menu>
+            </>
+          )}
+        </PopupState>
+
         <IconButton
           className="listItemChild"
           onClick={() => {

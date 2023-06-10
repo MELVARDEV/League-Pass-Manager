@@ -22,7 +22,7 @@ export async function autoFill(account: Account) {
 
     const autoFillPath = path.resolve(
       __dirname,
-      '../../../autofill/bin/Debug/net7.0-windows/AutoFill.exe'
+      '../../../autofill/bin/Debug/net7.0-windows/autofill.exe'
     );
 
     const args = [
@@ -31,10 +31,10 @@ export async function autoFill(account: Account) {
       '--remember-me=true',
       '--game-type=league_of_legends',
     ];
-
     const child = spawn(autoFillPath, args);
 
     // return when autofill is done
+    if (!child) reject(new Error('child process is not defined'));
 
     child.stdout.on('data', (data: any) => {
       console.log(`stdout: ${data}`);

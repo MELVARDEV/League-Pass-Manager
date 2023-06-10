@@ -13,7 +13,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { sortAccounts } from 'renderer/helpers/AccountHelpers';
 import AddIcon from '@mui/icons-material/Add';
-import { Fab, Chip } from '@mui/material';
+import { Fab, Chip, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 import AccountListElement from './AccountListElement';

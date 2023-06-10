@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import red from '@mui/material/colors/pink';
+import { MemoryRouter as Router } from 'react-router-dom';
 import App from './App';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -30,7 +31,9 @@ root.render(
   <ThemeProvider theme={theme}>
     <CssBaseline />
     <AccountProvider>
-      <App />
+      <Router>
+        <App />
+      </Router>
     </AccountProvider>
   </ThemeProvider>
 );

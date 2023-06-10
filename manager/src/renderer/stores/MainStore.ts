@@ -29,40 +29,46 @@ const fetchSummonerApiData = async (account: Account): Promise<Account> => {
   console.log('start fetchSummonerApiData');
   if (account.allowFetch === false) return account;
   if (account.summonerName && account.region) {
-    const reqSummoner = await fetch(
-      `https://express-tp4i3olaqq-ez.a.run.app/riot/summoner/${account.region}/${account.summonerName}`
-    );
-    const resSummoner = await reqSummoner.json();
+    try {
+      const reqSummoner = await fetch(
+        `https://express-tp4i3olaqq-ez.a.run.app/riot/summoner/${account.region}/${account.summonerName}`
+      );
+      const resSummoner = await reqSummoner.json();
 
-    if (resSummoner.error) {
-      throw new Error(resSummoner.error);
-    }
+      if (resSummoner.error) {
+        throw new Error(resSummoner.error);
+      }
 
-    await fetch(
-      `https://express-tp4i3olaqq-ez.a.run.app/riot/league/${account.region}/${account.summonerName}`
-    )
-      .then((res) => res.json())
-      .then((res) => {
-        if (isObjectEmpty(res)) return 0;
-        account.tier = res.tier;
-        account.rank = res.rank;
-        account.lp = res.leaguePoints;
-        return 0;
-      })
-      // eslint-disable-next-line no-unused-vars
-      .catch((_err) => {
-        account.tier = '';
-        account.rank = 'UNRANKED';
-        account.lp = 0;
+      await fetch(
+        `https://express-tp4i3olaqq-ez.a.run.app/riot/league/${account.region}/${account.summonerName}`
+      )
+        .then((res) => res.json())
+        .then((res) => {
+          if (isObjectEmpty(res)) return 0;
+          account.tier = res.tier;
+          account.rank = res.rank;
+          account.lp = res.leaguePoints;
+          return 0;
+        })
+        // eslint-disable-next-line no-unused-vars
+        .catch((_err) => {
+          account.tier = '';
+          account.rank = 'UNRANKED';
+          account.lp = 0;
+        });
+
+      account.summonerLevel = resSummoner.summonerLevel;
+      account.profileIconId = resSummoner.profileIconId;
+      account.lastFetchedAt = new Date();
+      window.electron.ipcRenderer.invoke('main', 'update-account', {
+        ...account,
       });
-
-    account.summonerLevel = resSummoner.summonerLevel;
-    account.profileIconId = resSummoner.profileIconId;
-    account.lastFetchedAt = new Date();
-    window.electron.ipcRenderer.invoke('main', 'update-account', {
-      ...account,
-    });
-    return account;
+      console.log(`end fetchSummonerApiData: ${account.summonerName} `);
+      return account;
+    } catch (error) {
+      console.log(`error fetchSummonerApiData: ${error}`);
+      return account;
+    }
   }
   throw new Error('Response is missing summonerName or profileIconId');
 };
@@ -146,6 +152,11 @@ export const createAccountStore = () => {
         }
         return a;
       });
+    },
+
+    async reFetchAccount(account: Account) {
+      const data = await fetchSummonerApiData(account);
+      this.updateAccount(data);
     },
 
     setAccounts(accounts: Account[]) {

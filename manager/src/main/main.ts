@@ -14,10 +14,17 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import fs from 'fs';
 import Account from 'types/Accounts';
+import crypto, { BinaryLike } from 'crypto';
 import MenuBuilder from './menu';
+
 import { resolveHtmlPath, autoFill } from './util';
 
 const isDebug = process.env.NODE_ENV === 'development';
+let password: BinaryLike | null = null;
+const algorithm = 'aes-192-cbc';
+let key: Buffer | null = null;
+let iv: Buffer | null = null;
+const encryptPasswordOnly = true;
 
 // create documents folder
 const appDataPath = app.getPath('documents');
@@ -32,26 +39,107 @@ if (!fs.existsSync(`${appDataPath}/R Account Manager`)) {
   fs.mkdirSync(`${appDataPath}/R Account Manager`);
 }
 
-// create accounts.json if it doesn't exist
-if (!fs.existsSync(`${appDataPath}/R Account Manager/accounts.json`)) {
-  fs.writeFileSync(
-    `${appDataPath}/R Account Manager/accounts.json`,
-    JSON.stringify([])
-  );
-}
+const encrypt = (data: string) => {
+  if (key === null || iv === null) {
+    throw new Error('Key or IV is null');
+  }
+
+  const cipher = crypto.createCipheriv(algorithm, key, iv);
+  const encrypted = cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
+  return encrypted;
+};
+
+const decrypt = (data: string) => {
+  if (key === null || iv === null) {
+    throw new Error('Key or IV is null');
+  }
+
+  const decipher = crypto.createDecipheriv(algorithm, key, iv);
+  const decrypted =
+    decipher.update(data, 'hex', 'utf8') + decipher.final('utf8');
+  return decrypted;
+};
+
+const createDataFile = () => {
+  if (password !== null) {
+    key = crypto.scryptSync(password, 'salt', 24);
+    iv = Buffer.alloc(16, 0);
+
+    // create accounts.json if it doesn't exist
+    if (!fs.existsSync(`${appDataPath}/R Account Manager/accounts.json`)) {
+      if (encryptPasswordOnly) {
+        fs.writeFileSync(
+          `${appDataPath}/R Account Manager/accounts.json`,
+          JSON.stringify([], null, 2)
+        );
+      } else {
+        fs.writeFileSync(
+          `${appDataPath}/R Account Manager/accounts.json`,
+          encrypt(JSON.stringify([], null, 2))
+        );
+      }
+    }
+
+    // create stub file for testing encryption
+    if (!fs.existsSync(`${appDataPath}/R Account Manager/stub`)) {
+      fs.writeFileSync(
+        `${appDataPath}/R Account Manager/stub`,
+        encrypt('encryption test')
+      );
+    }
+  }
+};
+
+createDataFile();
 
 const getAccounts = () => {
-  const accounts: Account[] = JSON.parse(
+  if (!password || !key || !iv) {
+    throw new Error('Password, key, or iv is null');
+  }
+
+  if (encryptPasswordOnly) {
+    const accounts = JSON.parse(
+      fs.readFileSync(`${appDataPath}/R Account Manager/accounts.json`, 'utf8')
+    );
+    return accounts.map((account: Account) => {
+      account.password = decrypt(account.password);
+      return account;
+    });
+  }
+
+  const decrypted = decrypt(
     fs.readFileSync(`${appDataPath}/R Account Manager/accounts.json`, 'utf8')
   );
+
+  console.log(decrypted);
+
+  const accounts = JSON.parse(decrypted);
 
   return accounts;
 };
 
 const saveAccounts = (accounts: Account[]) => {
+  if (!password || !key || !iv) {
+    throw new Error('Password, key, or iv is null');
+  }
+
+  let accountsCopy: Account[] = [...accounts];
+  if (encryptPasswordOnly) {
+    accountsCopy = accounts.map((account) => {
+      account.password = encrypt(account.password);
+      return account;
+    });
+
+    fs.writeFileSync(
+      `${appDataPath}/R Account Manager/accounts.json`,
+      JSON.stringify(accountsCopy, null, 2)
+    );
+    return;
+  }
+
   fs.writeFileSync(
     `${appDataPath}/R Account Manager/accounts.json`,
-    JSON.stringify(accounts)
+    encrypt(JSON.stringify(accountsCopy, null, 2))
   );
 };
 
@@ -63,16 +151,60 @@ const addAccount = (account: Account) => {
 
 const removeAccount = (uid: string) => {
   const accounts = getAccounts();
-  const index = accounts.findIndex((account) => account.uid === uid);
+  const index = accounts.findIndex((account: Account) => account.uid === uid);
   accounts.splice(index, 1);
   saveAccounts(accounts);
 };
 
 const updateAccount = (account: Account) => {
   const accounts = getAccounts();
-  const index = accounts.findIndex((acc) => acc.uid === account.uid);
+  const index = accounts.findIndex((acc: Account) => acc.uid === account.uid);
   accounts[index] = account;
   saveAccounts(accounts);
+};
+
+const checkSetup = () => {
+  const setupInfo = {
+    password: password !== null,
+    accounts: fs.existsSync(`${appDataPath}/R Account Manager/accounts.json`),
+  };
+
+  return setupInfo;
+};
+
+const runSetup = (pass: any) => {
+  let passwordCorrect = true;
+  password = pass;
+  if (!password) {
+    throw new Error('Password is null');
+  }
+  key = crypto.scryptSync(password, 'salt', 24);
+  iv = Buffer.alloc(16, 0);
+
+  // check if accounts and stub file exist
+  const accountsExist = fs.existsSync(
+    `${appDataPath}/R Account Manager/accounts.json`
+  );
+  const stubExists = fs.existsSync(`${appDataPath}/R Account Manager/stub`);
+
+  // if accounts and stub file exist, check if password is correct
+  if (accountsExist && stubExists) {
+    // test the password against the stub file
+    try {
+      const decrypted = decrypt(
+        fs.readFileSync(`${appDataPath}/R Account Manager/stub`, 'utf8')
+      );
+      if (decrypted !== 'encryption test') {
+        throw new Error('Password is incorrect');
+      }
+    } catch (err) {
+      passwordCorrect = false;
+    }
+  } else {
+    createDataFile();
+  }
+
+  return { ...checkSetup, passwordCorrect };
 };
 
 ipcMain.handle('main', async (event: any, ...args: any) => {
@@ -89,6 +221,11 @@ ipcMain.handle('main', async (event: any, ...args: any) => {
       return updateAccount(args[1]);
     case 'auto-fill':
       return autoFill(args[1]);
+    case 'check-setup':
+      return checkSetup();
+    case 'run-setup':
+      return runSetup(args[1]);
+
     case 'close':
       return app.quit();
     default:

@@ -2,6 +2,7 @@
 import { URL } from 'url';
 import { spawn } from 'child_process';
 import path from 'path';
+import { app, dialog } from 'electron';
 import Account from '../types/Accounts';
 
 // const isDebug = process.env.NODE_ENV === 'development';
@@ -16,14 +17,25 @@ export function resolveHtmlPath(htmlFileName: string) {
   return `file://${path.resolve(__dirname, '../renderer/', htmlFileName)}`;
 }
 
+const isDebug = process.env.NODE_ENV === 'development';
+
 export async function autoFill(account: Account) {
   return new Promise((resolve, reject) => {
     const { userName, password } = account;
 
-    const autoFillPath = path.resolve(
+    let autoFillPath = path.resolve(
       __dirname,
-      '../../../autofill/bin/Debug/net7.0-windows/autofill.exe'
+      '../',
+      'autofill',
+      'bin',
+      'Release',
+      'net7.0-windows',
+      'autofill.exe'
     );
+
+    if (!isDebug) {
+      autoFillPath = path.resolve('resources', 'autofill', 'autofill.exe');
+    }
 
     const args = [
       `--username=${userName}`,

@@ -2,6 +2,7 @@
 type Account = {
   uid: string;
   summonerName: string;
+  tagName: string;
   summonerLevel?: number;
   region: string;
   description?: string;

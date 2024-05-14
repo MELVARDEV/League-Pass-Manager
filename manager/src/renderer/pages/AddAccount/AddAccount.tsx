@@ -12,6 +12,7 @@ function AddAccount() {
   const [newAccountInputs, setNewAccountInputs] = useState({
     region: '',
     summonerName: '',
+    tagName: '',
     userName: '',
     password: '',
   });
@@ -31,6 +32,7 @@ function AddAccount() {
       region: newAccountInputs.region,
       summonerName: newAccountInputs.summonerName,
       userName: newAccountInputs.userName,
+      tagName: newAccountInputs.tagName,
       password: newAccountInputs.password,
       lp: 0,
       rank: '',
@@ -81,6 +83,16 @@ function AddAccount() {
             onChange={handleInputChange}
             id="outlined-basic"
             label="Summoner Name"
+            variant="outlined"
+          />
+
+          <h3>Tag Name</h3>
+          <TextField
+            name="tagName"
+            sx={{ width: '100%' }}
+            onChange={handleInputChange}
+            id="outlined-basic"
+            label="Tag Name"
             variant="outlined"
           />
 

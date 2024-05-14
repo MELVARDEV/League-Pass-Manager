@@ -7,6 +7,7 @@ module.exports = {
     'react/jsx-filename-extension': 'off',
     'import/extensions': 'off',
     'import/no-unresolved': 'off',
+    'import/no-duplicates': 'off',
     'no-console': 'off',
     'no-unused-vars': 'warn',
     'import/no-import-module-exports': 'off',

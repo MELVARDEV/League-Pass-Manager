@@ -19,6 +19,7 @@ export default function EditAccount() {
     summonerName: '',
     userName: '',
     password: '',
+    tagName: ''
   });
 
   const handleInputChange = (e: any) => {
@@ -33,6 +34,7 @@ export default function EditAccount() {
     const newAccount: Account = {
       uid: account?.uid || '',
       region: newAccountInputs.region,
+      tagName: newAccountInputs.tagName,
       summonerName: newAccountInputs.summonerName,
       userName: newAccountInputs.userName,
       password: newAccountInputs.password,
@@ -70,6 +72,7 @@ export default function EditAccount() {
     setNewAccountInputs({
       region: a.region,
       summonerName: a.summonerName,
+      tagName: a.tagName,
       userName: a.userName,
       password: a.password,
     });
@@ -105,6 +108,17 @@ export default function EditAccount() {
             id="outlined-basic"
             defaultValue={account.summonerName}
             label="Summoner Name"
+            variant="outlined"
+          />
+
+          <h3>Tag Name</h3>
+          <TextField
+            name="tagName"
+            sx={{ width: '100%' }}
+            onChange={handleInputChange}
+            id="outlined-basic"
+            defaultValue={account.tagName}
+            label="Tag Name"
             variant="outlined"
           />
 

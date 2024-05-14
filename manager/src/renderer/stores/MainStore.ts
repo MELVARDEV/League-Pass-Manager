@@ -1,4 +1,4 @@
-import AppConfig from 'types/Config';
+import AppConfig from '../../types/Config';
 import Account from '../../types/Accounts';
 
 export const createAppConfigStore = () => {
@@ -30,24 +30,30 @@ const fetchSummonerApiData = async (account: Account): Promise<Account> => {
   if (account.allowFetch === false) return account;
   if (account.summonerName && account.region) {
     try {
-      const reqSummoner = await fetch(
-        `https://express-tp4i3olaqq-ez.a.run.app/riot/summoner/${account.region}/${account.summonerName}`
-      );
-      const resSummoner = await reqSummoner.json();
-
-      if (resSummoner.error) {
-        throw new Error(resSummoner.error);
-      }
-
       await fetch(
-        `https://express-tp4i3olaqq-ez.a.run.app/riot/league/${account.region}/${account.summonerName}`
+        `http://localhost:8080/riot/league/${account.region}/${account.summonerName}/${account.tagName}`
       )
         .then((res) => res.json())
         .then((res) => {
+          console.log(res);
+
+          if (res) {
+            account.tier = res.obj.tier;
+            account.rank = res.obj.rank;
+            account.lp = res.obj.leaguePoints;
+            account.summonerLevel = res.account.summonerLevel;
+            account.profileIconId = res.account.profileIconId;
+          }
+
+          if (!res) {
+            account.tier = '';
+            account.rank = 'UNRANKED';
+            account.lp = 0;
+            account.summonerLevel = 0;
+            account.profileIconId = 0;
+          }
+
           if (isObjectEmpty(res)) return 0;
-          account.tier = res.tier;
-          account.rank = res.rank;
-          account.lp = res.leaguePoints;
           return 0;
         })
         // eslint-disable-next-line no-unused-vars
@@ -57,8 +63,6 @@ const fetchSummonerApiData = async (account: Account): Promise<Account> => {
           account.lp = 0;
         });
 
-      account.summonerLevel = resSummoner.summonerLevel;
-      account.profileIconId = resSummoner.profileIconId;
       account.lastFetchedAt = new Date();
       window.electron.ipcRenderer.invoke('main', 'update-account', {
         ...account,

@@ -7,6 +7,12 @@ const cacheSchema = new mongoose.Schema({
   timeFetched: {
     type: Date,
   },
+  gameName: {
+    type: String,
+  },
+  tagLine: {
+    type: String,
+  },
   endPoint: {
     type: String,
   },

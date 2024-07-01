@@ -8,40 +8,21 @@ function parseRegion(requestRegion) {
 
   switch (requestRegion.toUpperCase()) {
     case "BR":
-      region = "BR1";
+    case "LAN":
+    case "LAS":
+    case "NA":
+    case "OCE":
+      region = "americas";
       break;
     case "EUNE":
-      region = "EUN1";
-      break;
     case "EUW":
-      region = "EUW1";
-      break;
-    case "LAN":
-      region = "LA1";
-      break;
-    case "LAS":
-      region = "LA2";
-      break;
-    case "NA":
-      region = "NA1";
-      break;
-    case "OCE":
-      region = "OC1";
-      break;
-    case "RU":
-      region = "RU1";
-      break;
     case "TR":
-      region = "TR1";
+    case "RU":
+      region = "europe";
       break;
     case "JP":
-      region = "JP1";
-      break;
     case "KR":
-      region = "KR";
-      break;
-    case "PBE":
-      region = "PBE";
+      region = "asia";
       break;
     default:
       break;
@@ -49,15 +30,78 @@ function parseRegion(requestRegion) {
   return region;
 }
 
-router.get("/league/:region/:name", async (req, res) => {
-  if (!req.params.name) {
-    return res.status(400).send("Name required");
+// parse region but return both region and platform
+function parseRegionWithPlatform(requestRegion) {
+  let region = parseRegion(requestRegion);
+  let platform = null;
+
+  if (!region) {
+    return null;
+  }
+
+
+
+  // parse the platform based on input, basically reverse parseRegion
+
+
+  switch (requestRegion.toUpperCase()) {
+    case "EUW":
+      platform = "euw1";
+      break;
+    case "EUNE":
+      platform = "eun1";
+      break;
+    case "TR":
+      platform = "tr1";
+      break;
+    case "RU":
+      platform = "ru";
+      break;
+    case "JP":
+      platform = "jp1";
+      break;
+    case "KR":
+      platform = "kr";
+      break;
+    case "NA":
+      platform = "na1";
+      break;
+    case "BR":
+      platform = "br1";
+      break;
+    case "OCE":
+      platform = "oc1";
+      break;
+    default:
+      break;
+
+
+  
+  }
+
+    // if input is either "americas", "europe", or "asia" then return platform, else return the platform of the region
+    if (["americas", "europe", "asia"].includes(region)) {
+      return {
+        region: region,
+        platform: platform
+      };
+    }
+
+  return {
+    region: region,
+    platform: platform,
+  }
+}
+
+router.get("/league/:region/:gameName/:tagLine", async (req, res) => {
+  if (!req.params.gameName || !req.params.tagLine) {
+    return res.status(400).send("Game name and tag line required");
   }
 
   if (!req.params.region) {
     return res.status(400).send("Region required");
   }
-
+  
   const region = parseRegion(req.params.region);
 
   if (!region) {
@@ -70,7 +114,8 @@ router.get("/league/:region/:name", async (req, res) => {
       {
         endPoint: "league",
         region: region,
-        name: req.params.name,
+        gameName: req.params.gameName,
+        tagLine: req.params.tagLine,
         timeFetched: {
           $gte: new Date(Date.now() - process.env.CACHE_TIME * 60 * 1000),
         },
@@ -83,8 +128,8 @@ router.get("/league/:region/:name", async (req, res) => {
       let obj = JSON.parse(fetchedCache.jsonString);
 
       obj.cached = true;
-      delete obj.summonerName;
-
+      delete obj.gameName;
+      delete obj.tagLine;
       return res.status(200).send(obj);
     }
   } catch (error) {
@@ -92,36 +137,38 @@ router.get("/league/:region/:name", async (req, res) => {
   }
 
   fetch(
-    `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${req.params.name}?api_key=${riotApiKey}`
+    `https://${region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${req.params.gameName}/${req.params.tagLine}?api_key=${riotApiKey}`
   )
     .then((response) => response.json())
-    .then((summoner) => {
+    .then((account) => {
       fetch(
-        `https://${region}.api.riotgames.com/lol/league/v4/entries/by-summoner/${summoner.id}`,
-        {
-          method: "GET",
-          headers: { "X-Riot-Token": riotApiKey },
-        }
+        `https://${parseRegionWithPlatform(req.params.region).platform}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${account.puuid}?api_key=${riotApiKey}`,
       )
         .then((response) => response.json())
-        .then((league) => {
-          let obj = league.find((x) => x.queueType == "RANKED_SOLO_5x5");
+        .then((account) => {
+          
+          fetch(
+            `https://${parseRegionWithPlatform(req.params.region).platform}.api.riotgames.com/lol/league/v4/entries/by-summoner/${account.id}?api_key=${riotApiKey}`,
+          ).then((res) => res.json()).then((league) => {
 
-          console.log(region, req.params.name, summoner, league);
+            let obj = league.find((x) => x.queueType == "RANKED_SOLO_5x5");
+  
+  
+            let cache = new Cache({
+              jsonString: JSON.stringify({obj,account}),
+              timeFetched: Date.now(),
+              endPoint: "league",
+              region: region,
+              gameName: req.params.gameName,
+              tagLine: req.params.tagLine,
+            });
+  
+            cache.save();
+  
+            return res.status(200).send({obj, account});
+          })
 
-          let cache = new Cache({
-            jsonString: JSON.stringify(obj),
-            timeFetched: Date.now(),
-            endPoint: "league",
-            region: region,
-            name: req.params.name,
-          });
-
-          cache.save();
-          delete obj.summonerName;
-          obj.cached = false;
-
-          return res.status(200).send(obj);
+         
         })
         .catch((err) => {
           console.trace(err);
@@ -130,7 +177,8 @@ router.get("/league/:region/:name", async (req, res) => {
             timeFetched: Date.now(),
             endPoint: "league",
             region: region,
-            name: req.params.name,
+            gameName: req.params.gameName,
+            tagLine: req.params.tagLine,
           });
 
           cache.save();
@@ -143,83 +191,6 @@ router.get("/league/:region/:name", async (req, res) => {
     });
 });
 
-router.get("/summoner/:region/:name", async (req, res) => {
-  if (!req.params.name) {
-    return res.status(400).send("Name required");
-  }
 
-  if (!req.params.region) {
-    return res.status(400).send("Region required");
-  }
-
-  const region = parseRegion(req.params.region);
-
-  if (!region) {
-    return res.status(400).send("Region invalid");
-  }
-
-  try {
-    let fetchedCache = await Cache.findOne(
-      {
-        endPoint: "summoner",
-        region: region,
-        name: req.params.name,
-        timeFetched: {
-          $gte: new Date(Date.now() - process.env.CACHE_TIME * 60 * 1000),
-        },
-      },
-      {},
-      { sort: { created_at: -1 } }
-    );
-
-    if (fetchedCache) {
-      let obj = JSON.parse(fetchedCache.jsonString);
-
-      obj.cached = true;
-
-      return res.status(200).send(obj);
-    }
-  } catch (error) {
-    return res.status(400).send("Fetching cache failed");
-  }
-
-  fetch(
-    `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${req.params.name}?api_key=${riotApiKey}`
-  )
-    .then((response) => response.json())
-    .then((summoner) => {
-      console.log(summoner);
-      if (!summoner.accountId) {
-        throw new Error("Not found");
-      }
-
-      let cache = new Cache({
-        jsonString: JSON.stringify(summoner),
-        timeFetched: Date.now(),
-        endPoint: "summoner",
-        region: region,
-        name: req.params.name,
-      });
-
-      cache.save();
-
-      summoner.cached = false;
-      res.status(200).send(summoner);
-    })
-    .catch((err) => {
-      console.trace(err);
-      let cache = new Cache({
-        jsonString: null,
-        timeFetched: Date.now(),
-        endPoint: "summoner",
-        region: region,
-        name: req.params.name,
-      });
-
-      cache.save();
-
-      return res.status(400).send("error");
-    });
-});
 
 module.exports = router;

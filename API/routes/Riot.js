@@ -54,6 +54,12 @@ function parseRegionWithPlatform(requestRegion) {
     case "TR":
       platform = "tr1";
       break;
+    case "LAN":
+      platform = "la1";
+      break;
+    case "LAS":
+      platform = "la2";
+      break;
     case "RU":
       platform = "ru";
       break;
@@ -124,7 +130,8 @@ router.get("/league/:region/:gameName/:tagLine", async (req, res) => {
       { sort: { created_at: -1 } }
     );
 
-    if (fetchedCache) {
+    if (fetchedCache && fetchedCache.jsonString) {
+      console.log(fetchedCache);
       let obj = JSON.parse(fetchedCache.jsonString);
 
       obj.cached = true;
@@ -133,6 +140,7 @@ router.get("/league/:region/:gameName/:tagLine", async (req, res) => {
       return res.status(200).send(obj);
     }
   } catch (error) {
+    console.log(error);
     return res.status(400).send("Fetching cache failed");
   }
 
@@ -146,16 +154,16 @@ router.get("/league/:region/:gameName/:tagLine", async (req, res) => {
       )
         .then((response) => response.json())
         .then((account) => {
-          
+          console.log(account)
           fetch(
             `https://${parseRegionWithPlatform(req.params.region).platform}.api.riotgames.com/lol/league/v4/entries/by-summoner/${account.id}?api_key=${riotApiKey}`,
           ).then((res) => res.json()).then((league) => {
-
+            console.log(league)
             let obj = league.find((x) => x.queueType == "RANKED_SOLO_5x5");
   
   
             let cache = new Cache({
-              jsonString: JSON.stringify({obj,account}),
+              jsonString: JSON.stringify({...obj,...account, tagLine: req.params.tagLine, gameName: req.params.gameName}),
               timeFetched: Date.now(),
               endPoint: "league",
               region: region,
@@ -165,7 +173,7 @@ router.get("/league/:region/:gameName/:tagLine", async (req, res) => {
   
             cache.save();
   
-            return res.status(200).send({obj, account});
+            return res.status(200).send({...obj, ...account, tagLine: req.params.tagLine, gameName: req.params.gameName});
           })
 
          

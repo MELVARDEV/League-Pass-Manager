@@ -21,9 +21,13 @@ const riotRoute = require("./routes/Riot");
 // use routes
 app.use("/riot", riotRoute);
 
+// healthcheck route
+app.get("/healthcheck", (req, res) => {
+  res.send("OK");
+});
 
 
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
-  console.log(`nodejs: listening on port ${port}`);
+  console.log(`nodejs: app listening on port ${port}`);
 });

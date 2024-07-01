@@ -102,6 +102,11 @@
                                      Binding="{Binding Path=SummonerName}"
                                      IsReadOnly="False">
                                         </DataGridTextColumn>
+                                        <DataGridTextColumn Header="Name Tag"
+                                    x:Name="columnTagLine" 
+                                    Binding="{Binding Path=TagLine}"
+                                    IsReadOnly="False">
+                                        </DataGridTextColumn>
                                         <DataGridTextColumn Header="Login"
                                      x:Name="columnUserName" 
                                                    

@@ -20,7 +20,7 @@
     "express": "^4.17.1",
     "mongoose": "^5.13.2",
     "node-fetch": "^2.6.1",
-    "nodemon": "^3.1.0",
+    "nodemon": "^3.1.4",
     "watchman": "^1.0.0"
   }
 }

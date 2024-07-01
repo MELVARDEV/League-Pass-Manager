@@ -78,6 +78,17 @@ namespace LeaguePassManager
             }
         }
 
+        private string _tagLine;
+        public string TagLine
+        {
+            get { return _tagLine; }
+            set
+            {
+                _tagLine = value;
+                Raise("TagName");
+            }
+        }
+
         private string _rank;
         public string Rank
         {
@@ -162,15 +173,13 @@ namespace LeaguePassManager
             }
             else
             {
-                Task.Run(() =>
-                {
+                
                     using (WebClient myWebClient = new WebClient())
                     {
                         // Download icon
                         myWebClient.DownloadFile($"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/{this.ProfileIconId}.jpg", path);
                     }
-                });
-              
+               
                 return Path.GetFullPath(path);
             }
 
@@ -233,14 +242,15 @@ namespace LeaguePassManager
 
         private void getApiData()
         {
-            if (!string.IsNullOrEmpty(this.SummonerName) && !string.IsNullOrEmpty(this.Region) && this.Region != "...")
+            Console.WriteLine(this.TagLine);
+            if (!string.IsNullOrEmpty(this.SummonerName) && !string.IsNullOrEmpty(this.Region) && this.Region != "..." && !string.IsNullOrEmpty(this.TagLine))
             {
                 Task t = Task.Run(async () =>
                 {
                     try
                     {
                         HttpClient leagueReq = new HttpClient();
-                        var leagueContent = await leagueReq.GetAsync($"https://express-tp4i3olaqq-ez.a.run.app/riot/league/{this.Region}/{this.SummonerName}");
+                        var leagueContent = await leagueReq.GetAsync($"https://express-tp4i3olaqq-ez.a.run.app/riot/league/{this.Region}/{this.SummonerName}/{this.TagLine}");
                         JsonConvert.PopulateObject(await leagueContent.Content.ReadAsStringAsync(), this);
                     }
                     catch (Exception ex)
@@ -248,16 +258,7 @@ namespace LeaguePassManager
                         this.Tier = "Unranked";
                     }
 
-                    try
-                    {
-                        HttpClient summonerReq = new HttpClient();
-                        var summonerContent = await summonerReq.GetAsync($"https://express-tp4i3olaqq-ez.a.run.app/riot/summoner/{this.Region}/{this.SummonerName}");
-                        JsonConvert.PopulateObject(await summonerContent.Content.ReadAsStringAsync(), this);
-                    }
-                    catch (Exception ex)
-                    {
-                    }
-
+                  
                     getIcon();
                     Raise("IconPath");
                 });

@@ -14,6 +14,13 @@
             <sys:String>EUW</sys:String>
             <sys:String>NA</sys:String>
             <sys:String>KR</sys:String>
+            <sys:String>OCE</sys:String>
+            <sys:String>LAN</sys:String>
+            <sys:String>LAS</sys:String>
+            <sys:String>TR</sys:String>
+            <sys:String>JP</sys:String>
+            <sys:String>BR</sys:String>
+            <sys:String>RU</sys:String>
             <sys:String>...</sys:String>
         </x:Array>
         <FontFamily x:Key="friz" >/assets/#Friz</FontFamily>
